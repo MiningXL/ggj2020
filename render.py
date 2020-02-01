@@ -156,7 +156,8 @@ class RenderGrid( Render ):
 				# Create a point list containing the offset cell
 				points = [( x + left, y + top ) for ( x, y ) in self.cell]
 				# Draw the polygon onto the surface
-				pygame.draw.polygon( self, self.GRID_COLOR, points, 2 )
+				pygame.draw.polygon( self, (255,255,0), points, 0 )
+				pygame.draw.polygon(self, self.GRID_COLOR, points, 2)
 
 class RenderFog( Render ):
 

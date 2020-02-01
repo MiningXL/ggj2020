@@ -7,21 +7,36 @@ import pygame
 import numpy as np
 
 from map import Map
-from render import RenderGrid, RenderUnits, SQRT3
+
 import random
+import math
 
 import time
 
 summen = True
 RADIUS = 40
+SQRT3 = math.sqrt( 3 )
 
 
 current_path = os.path.dirname(__file__)
 
+def get_surface_pos(pos):
+    """
+    Returns a subsurface corresponding to the surface, hopefully with trim_cell wrapped around the blit method.
+    """
+    row = pos[0]
+    col = pos[1]
+    width = 2 * RADIUS
+    height = RADIUS * SQRT3
+
+    midy = (row - math.ceil(col / 2.0)) * height + (height / 2 if col % 2 == 1 else 0) + height/2
+    midx = 1.5 * RADIUS * col + width/2
+
+    return (midx, midy)
+
 class Bee:
-    def __init__(self, grid_pos, render_grid, id=None, color=None, image='bee_small_2.png'):
+    def __init__(self, grid_pos, id=None, color=None, image='bee_small_2.png'):
         self.grid_pos = grid_pos
-        self.render_grid = render_grid
         self.id = id
         self.color = color
 
@@ -29,13 +44,20 @@ class Bee:
         self.image = pygame.transform.scale(self.image, (2*RADIUS, 2*RADIUS))
         color_bee = pygame.Surface(self.image.get_size()).convert_alpha()
         color_bee.fill(self.color)
-
         self.image.blit(color_bee, (0,0), special_flags = pygame.BLEND_RGBA_MULT)
+
+        wing_bee = pygame.image.load(os.path.join(current_path, 'bee_wings.png'))
+        wing_bee = pygame.transform.scale(wing_bee, (2*RADIUS, 2*RADIUS))
+        self.image.blit(wing_bee, (0, 0))
+
         line_bee = pygame.image.load(os.path.join(current_path, 'bee_lines.png'))
         line_bee = pygame.transform.scale(line_bee, (2*RADIUS, 2*RADIUS))
         self.image.blit(line_bee, (0, 0))
 
-        self.surface_pos = self.render_grid.get_surface_pos(self.grid_pos) # current draw position of bee
+        self.surface_pos = self.get_target_pos() # current draw position of bee
+
+    def get_target_pos(self):
+        return get_surface_pos(self.grid_pos)
 
     def paint(self, surface):
         radius = surface.get_width() / 2
@@ -44,17 +66,42 @@ class Bee:
 
 
 # define secondary functions
-def draw_grid(surface, grid):
+def draw_grid(surface, map):
     surface.fill(pygame.Color('white'))
-    grid.draw()
+    """
+    Draws a hex grid, based on the map object, onto this Surface
+    """
+    cell = [(.5 * RADIUS, 0),
+                 (1.5 * RADIUS, 0),
+                 (2 * RADIUS, SQRT3 / 2 * RADIUS),
+                 (1.5 * RADIUS, SQRT3 * RADIUS),
+                 (.5 * RADIUS, SQRT3 * RADIUS),
+                 (0, SQRT3 / 2 * RADIUS)]
 
-    surface.blit(grid, (0, 0))
+    # A point list describing a single cell, based on the radius of each hex
+    for col in range(map.cols):
+        # Alternate the offset of the cells based on column
+        offset = RADIUS * SQRT3 / 2 if col % 2 else 0
+        for row in range(map.rows):
+            # Calculate the offset of the cell
+            top = offset + SQRT3 * row * RADIUS
+            left = 1.5 * col * RADIUS
+            # Create a point list containing the offset cell
+            points = [(x + left, y + top) for (x, y) in cell]
+            # Draw the polygon onto the surface
 
-def draw_bees(surface, bees, render_grid):
+            if col==3 and row == 4:
+                #pass
+                pygame.draw.polygon(surface, (0, 0, 255), points, 0)
+            else:
+                pygame.draw.polygon(surface, (255, 255, 0), points, 0)
+
+            pygame.draw.polygon(surface, (0,0,0), points, 2)
+
+    #surface.blit(grid, (0, 0))
+
+def draw_bees(surface, bees):
     for bee in bees:
-        #target_pos = render_grid.get_surface_pos(bee.grid_pos)
-        #current_pos = bee.surface_pos
-        #bee.surface_pos = render_grid.get_surface_pos(bee.grid_pos)
         bee_pos_shift = (bee.surface_pos[0]-bee.image.get_height()/2,bee.surface_pos[1]-bee.image.get_width()/2)
         surface.blit(bee.image, (bee_pos_shift,(0,0)))
 
@@ -64,7 +111,7 @@ def draw_bees(surface, bees, render_grid):
 def move_bees(bees):
     # calculate next position on bee path
     for bee in bees:
-        target_pos = np.array(bee.render_grid.get_surface_pos(bee.grid_pos))
+        target_pos = np.array(bee.get_target_pos())
         current_pos = np.array(bee.surface_pos)
         path = target_pos - current_pos
         #print(np.linalg.norm(path))
@@ -116,14 +163,13 @@ def main():
     # define a variable to control the main loop
     running = True
 
-    grid_horizontal = 7
-    grid_vertical = 7
+    grid_horizontal = 10
+    grid_vertical = 15
     m = Map(grid_horizontal, grid_vertical)
-    # define Radius from gridsize and screensize
-    grid = RenderGrid(m, radius = RADIUS)
-    units = RenderUnits(m, radius = RADIUS)
 
-    bees = [Bee((3,3), grid, id=0, color=(255,0,0)) , Bee((5,1), grid, id=1, color=(0,255,0))]
+    # define Radius from gridsize and screensize
+
+    bees = [Bee((3,3), id=0, color=(255,0,0)) , Bee((5,1), id=1, color=(0,255,0))]
 
     # main loop
     while running:
@@ -140,40 +186,12 @@ def main():
                         bees[xy_move[2]].grid_pos = pos
                 except KeyError:
                     pass
-
-                """
-                if event.key == pygame.K_w:
-                    pos = bees[0].grid_pos
-                    # pos = (column, row)
-                    pos = (pos[0]-1, pos[1]-1)
-                    bees[0].grid_pos = pos
-                if event.key == pygame.K_e:
-                    pos = bees[0].grid_pos
-                    pos = (pos[0]-1, pos[1])
-                    bees[0].grid_pos = pos
-                if event.key == pygame.K_d:
-                    pos = bees[0].grid_pos
-                    pos = (pos[0], pos[1]+1)
-                    bees[0].grid_pos = pos
-                if event.key == pygame.K_x:
-                    pos = bees[0].grid_pos
-                    pos = (pos[0]+1, pos[1]+1)
-                    bees[0].grid_pos = pos
-                if event.key == pygame.K_y:
-                    pos = bees[0].grid_pos
-                    pos = (pos[0]+1, pos[1])
-                    bees[0].grid_pos = pos
-                if event.key == pygame.K_a:
-                    pos = bees[0].grid_pos
-                    pos = (pos[0], pos[1]-1)
-                    bees[0].grid_pos = pos
-                """
             if event.type == pygame.QUIT:
-                # chankge the value to False, to exit the main loop
+                # change the value to False, to exit the main loop
                 running = False
         move_bees(bees)
-        draw_grid(screen, grid)
-        draw_bees(screen, bees, grid)
+        draw_grid(screen, m)
+        draw_bees(screen, bees)
 
         pygame.display.flip()
         # draw a line
