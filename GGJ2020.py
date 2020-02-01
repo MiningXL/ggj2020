@@ -9,6 +9,7 @@ import numpy as np
 from map import Map
 from render import RenderGrid, RenderUnits, SQRT3
 import random
+import math
 
 import time
 
@@ -18,10 +19,23 @@ RADIUS = 40
 
 current_path = os.path.dirname(__file__)
 
+def get_surface_pos(pos):
+    """
+    Returns a subsurface corresponding to the surface, hopefully with trim_cell wrapped around the blit method.
+    """
+    row = pos[0]
+    col = pos[1]
+    width = 2 * RADIUS
+    height = RADIUS * SQRT3
+
+    midy = (row - math.ceil(col / 2.0)) * height + (height / 2 if col % 2 == 1 else 0) + height/2
+    midx = 1.5 * RADIUS * col + width/2
+
+    return (midx, midy)
+
 class Bee:
-    def __init__(self, grid_pos, render_grid, id=None, color=None, image='bee_small_2.png'):
+    def __init__(self, grid_pos, id=None, color=None, image='bee_small_2.png'):
         self.grid_pos = grid_pos
-        self.render_grid = render_grid
         self.id = id
         self.color = color
 
@@ -38,7 +52,7 @@ class Bee:
         self.surface_pos = self.get_target_pos() # current draw position of bee
 
     def get_target_pos(self):
-        return self.render_grid.get_surface_pos(self.grid_pos)
+        return get_surface_pos(self.grid_pos)
 
     def paint(self, surface):
         radius = surface.get_width() / 2
@@ -120,10 +134,9 @@ def main():
     grid_vertical = 15
     m = Map(grid_horizontal, grid_vertical)
     # define Radius from gridsize and screensize
-    grid = RenderGrid(m, radius = RADIUS)
     units = RenderUnits(m, radius = RADIUS)
 
-    bees = [Bee((3,3), grid, id=0, color=(255,0,0)) , Bee((5,1), grid, id=1, color=(0,255,0))]
+    bees = [Bee((3,3), id=0, color=(255,0,0)) , Bee((5,1), id=1, color=(0,255,0))]
 
     # main loop
     while running:
