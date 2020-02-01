@@ -7,7 +7,7 @@ import pygame
 import numpy as np
 
 from map import Map
-from render import RenderGrid, RenderUnits, SQRT3
+
 import random
 import math
 
@@ -15,6 +15,7 @@ import time
 
 summen = True
 RADIUS = 40
+SQRT3 = math.sqrt( 3 )
 
 
 current_path = os.path.dirname(__file__)
@@ -165,8 +166,8 @@ def main():
     grid_horizontal = 10
     grid_vertical = 15
     m = Map(grid_horizontal, grid_vertical)
+
     # define Radius from gridsize and screensize
-    units = RenderUnits(m, radius = RADIUS)
 
     bees = [Bee((3,3), id=0, color=(255,0,0)) , Bee((5,1), id=1, color=(0,255,0))]
 
@@ -185,39 +186,6 @@ def main():
                         bees[xy_move[2]].grid_pos = pos
                 except KeyError:
                     pass
-
-                """
-                if event.key == pygame.K_w:
-                    pos = bees[0].grid_pos
-                    # pos = (column, row)
-                    pos = (pos[0]-1, pos[1]-1)
-                    if m.valid_cell(pos):
-                        bees[0].grid_pos = pos
-                if event.key == pygame.K_e:
-                    pos = bees[0].grid_pos
-                    pos = (pos[0]-1, pos[1])
-                    if m.valid_cell(pos):
-                        bees[0].grid_pos = pos
-                if event.key == pygame.K_d:
-                    pos = bees[0].grid_pos
-                    pos = (pos[0], pos[1]+1)
-                    if m.valid_cell(pos):
-                        bees[0].grid_pos = pos
-                if event.key == pygame.K_x:
-                    pos = bees[0].grid_pos
-                    pos = (pos[0]+1, pos[1]+1)
-                    if m.valid_cell(pos):
-                        bees[0].grid_pos = pos
-                if event.key == pygame.K_y:
-                    pos = bees[0].grid_pos
-                    pos = (pos[0]+1, pos[1])
-                    if m.valid_cell(pos):
-                        bees[0].grid_pos = pos
-                if event.key == pygame.K_a:
-                    pos = bees[0].grid_pos
-                    pos = (pos[0], pos[1]-1)
-                    bees[0].grid_pos = pos
-                """
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
                 running = False
