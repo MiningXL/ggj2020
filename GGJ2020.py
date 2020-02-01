@@ -86,6 +86,23 @@ def main():
     disp_width = 800
     screen = pygame.display.set_mode((disp_width, disp_height))
 
+    # Key Dictionary
+    key_dict = {
+        # pygame.key : (xmove, ymove, bee_id)
+        pygame.K_w : (-1,-1, 0),
+        pygame.K_e : (-1,0, 0),
+        pygame.K_d : (0,1, 0),
+        pygame.K_x : (1,1, 0),
+        pygame.K_y : (1,0, 0),
+        pygame.K_a : (0,-1, 0),
+        pygame.K_u: (-1, -1, 1),
+        pygame.K_i: (-1, 0, 1),
+        pygame.K_k: (0, 1, 1),
+        pygame.K_m: (1, 1, 1),
+        pygame.K_n: (1, 0, 1),
+        pygame.K_h: (0, -1, 1)
+    }
+
     # define a variable to control the main loop
     running = True
 
@@ -96,7 +113,7 @@ def main():
     grid = RenderGrid(m, radius=40)
     units = RenderUnits(m, radius=40)
 
-    bees = [Bee((3,3), grid, id=1, color=(255,0,0))]
+    bees = [Bee((3,3), grid, id=0, color=(255,0,0)) , Bee((5,1), grid, id=1, color=(0,255,0))]
 
     # main loop
     while running:
@@ -105,6 +122,16 @@ def main():
         for event in pygame.event.get():
             # only do something if the event is of type QUIT
             if event.type == pygame.KEYDOWN:
+                try:
+                    xy_move = key_dict[event.key]
+                    pos = bees[xy_move[2]].grid_pos
+                    pos = (pos[0] + xy_move[0], pos[1] + xy_move[1])
+                    if m.valid_cell(pos):
+                        bees[xy_move[2]].grid_pos = pos
+                except KeyError:
+                    pass
+
+                """
                 if event.key == pygame.K_w:
                     pos = bees[0].grid_pos
                     # pos = (column, row)
@@ -130,8 +157,9 @@ def main():
                     pos = bees[0].grid_pos
                     pos = (pos[0], pos[1]-1)
                     bees[0].grid_pos = pos
+                """
             if event.type == pygame.QUIT:
-                # change the value to False, to exit the main loop
+                # chankge the value to False, to exit the main loop
                 running = False
         move_bees(bees)
         draw_grid(screen, grid)
