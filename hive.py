@@ -1,6 +1,8 @@
 import pygame
 from constants import *
 import itertools as it
+from flower import Flower
+from intruder import Intruder
 
 # define secondary functions
 class Hive:
@@ -8,6 +10,10 @@ class Hive:
         self.rows = 5
         self.cols = 6
         self.cells = list(it.product(range(self.rows),range(self.cols)))
+        self.flowers = []
+        self.flowers_collected = 0
+        self.intruders = []
+        self.items = [self.flowers, self.intruders]
 
     def is_valid(self, pos):
         return pos in self.cells

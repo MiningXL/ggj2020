@@ -1,4 +1,5 @@
 import math
+from enum import Enum
 
 RADIUS = 40
 SQRT3 = math.sqrt(3)

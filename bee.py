@@ -2,7 +2,7 @@ import pygame
 import os
 import math
 
-from constants import SQRT3, RADIUS
+from constants import *
 
 current_path = os.path.dirname(__file__)
 
@@ -29,6 +29,7 @@ class Bee:
         self.grid_pos = grid_pos
         self.id = id
         self.color = color
+        self.item = None
 
         self.image = pygame.image.load(os.path.join(current_path, 'BEE_BODY.png'))
         self.image = pygame.transform.scale(self.image, (2*RADIUS, 2*RADIUS))
@@ -65,3 +66,7 @@ class Bee:
 
     def move_bee(self, pos):
         self.grid_pos = pos
+
+    def pick_up(self, item):
+        print('picked up:', item.__name__)
+        self.item = item

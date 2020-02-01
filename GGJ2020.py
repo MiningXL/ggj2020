@@ -17,6 +17,7 @@ from bee import Bee
 from htmlhandler import make_app
 import tornado
 import hive
+from constants import *
 
 import bot
 from flower import Flower
@@ -91,6 +92,9 @@ class GameManager:
         color = self.new_color()
         self.bees.update({id: Bee((x,y), id=id, color=color)})
 
+        self.bot_queue = queue.Queue()
+        self.bot = bot.Bot(self.bot_queue)
+
     def handle_bot_queue(self):
         while(not self.bot_queue.empty()):
             item = self.bot_queue.get()
@@ -108,6 +112,8 @@ class GameManager:
                     del self.bees[id]
                 except:
                     print("Kill Error")
+            elif cmd == 'action':
+                self.pick_up(id)
             else:
                 dir = html_dict[cmd]
                 if id in self.bees:
@@ -163,6 +169,15 @@ class GameManager:
         except:
             pass
 
+    def pick_up(self, id):
+        pos = self.bees[id].grid_pos
+        for item_list in self.hive.items:
+            for i,item in enumerate(item_list):
+                if item.grid_pos == pos:
+                    del item_list[i]
+                    continue
+            self.bees[id].pick_up(item)
+
     def draw_flowers(self, surface=None):
         if surface is None:
             surface = self.screen
@@ -174,6 +189,13 @@ class GameManager:
             surface = self.screen
         for intruder in self.intruders:
             intruder.paint(surface)
+
+    def draw_items(self, surface=None):
+        if surface is None:
+            surface = self.screen
+        for item_list in self.hive.items:
+            for item in item_list:
+                item.paint(surface)
 
     def apply_temperature(self):
         self.temperature -= 0.1
@@ -240,8 +262,9 @@ def main():
         game.hive.draw_grid(game.screen)
         game.draw_bees()
 
-        game.draw_flowers()
-        game.draw_intruders()
+        # game.draw_flowers()
+        # game.draw_intruders()
+        game.draw_items()
         game.draw_temperature()
 
         pygame.display.flip()
