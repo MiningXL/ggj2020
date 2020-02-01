@@ -26,17 +26,17 @@ class Bee:
         self.id = id
         self.color = color
 
-        self.image = pygame.image.load(os.path.join(current_path, 'bee_body.png'))
+        self.image = pygame.image.load(os.path.join(current_path, 'BEE_BODY.png'))
         self.image = pygame.transform.scale(self.image, (2*RADIUS, 2*RADIUS))
         color_bee = pygame.Surface(self.image.get_size()).convert_alpha()
         color_bee.fill(self.color)
         self.image.blit(color_bee, (0,0), special_flags = pygame.BLEND_RGBA_MULT)
 
-        wing_bee = pygame.image.load(os.path.join(current_path, 'bee_wings.png'))
+        wing_bee = pygame.image.load(os.path.join(current_path, 'BEE_WINGS.png'))
         wing_bee = pygame.transform.scale(wing_bee, (2*RADIUS, 2*RADIUS))
         self.image.blit(wing_bee, (0, 0))
 
-        line_bee = pygame.image.load(os.path.join(current_path, 'bee_lines.png'))
+        line_bee = pygame.image.load(os.path.join(current_path, 'BEE_LINES.png'))
         line_bee = pygame.transform.scale(line_bee, (2*RADIUS, 2*RADIUS))
         self.image.blit(line_bee, (0, 0))
 
