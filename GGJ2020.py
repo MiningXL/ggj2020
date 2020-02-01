@@ -20,8 +20,7 @@ import hive
 from constants import *
 
 import bot
-from flower import Flower
-from intruder import Intruder
+from asset import Flower, Intruder
 from constants import FPS
 
 import colorsys
