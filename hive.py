@@ -5,7 +5,9 @@ import itertools as it
 # define secondary functions
 class Hive:
     def __init__(self):
-        self.cells = list(it.product(range(5),range(5)))
+        self.rows = 5
+        self.cols = 6
+        self.cells = list(it.product(range(self.rows),range(self.cols)))
 
     def is_valid(self, pos):
         return pos in self.cells
@@ -24,7 +26,7 @@ class Hive:
 
         # A point list describing a single cell, based on the radius of each hex
         for cell in self.cells:
-            col, row = cell
+            row, col = cell
             # Alternate the offset of the cells based on column
             offset = RADIUS * SQRT3 / 2 if col % 2 else 0
             # Calculate the offset of the cell

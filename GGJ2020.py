@@ -25,12 +25,12 @@ pygame.init()
 pygame.display.set_caption("First Try")
 
 html_dict = {
-    'tl': (-1, -1),
+    'tl': (0, -1),
     't': (-1, 0),
-    'tr': (0, 1),
-    'br': (1, 1),
+    'tr': (-1, 1),
+    'br': (0, 1),
     'b': (1, 0),
-    'bl': (0, -1)
+    'bl': (-1, -1)
 }
 
 class GameManager:
@@ -59,7 +59,23 @@ class GameManager:
 
         self.hive = hive.Hive()
 
-        threading.Thread(target=tornado.ioloop.IOLoop.current().start).start()
+        self.tornado_target = tornado.ioloop.IOLoop.current()
+        self.tornado_thread = threading.Thread(target=self.tornado_target.start)
+        self.tornado_thread.start()
+
+    def new_color(self):
+        func = (random.randint(0,255) for i in range(3))
+        return tuple(func)
+
+    def add_bee(self, id):
+        valied = False
+        while not valied:
+            x = random.randint(0, self.hive.rows)
+            y = random.randint(0, self.hive.cols)
+            valied = self.hive.is_valid((x,y))
+
+        color = self.new_color()
+        self.bees.update({id: Bee((x,y), id=id, color=color)})
 
     def handle_input(self):
         while(not self.queue.empty()):
@@ -72,9 +88,7 @@ class GameManager:
                 if id in self.bees:
                     self.move_bee(id,dir)
                 else:
-                    x = random.randint(0, self.map.rows)
-                    y = random.randint(0, self.map.cols)
-                    self.bees[id] = Bee((x,y), id=id, color=(random.randint(0,255), random.randint(0,255), random.randint(0,255)))
+                    self.add_bee(id)
 
     #surface.blit(grid, (0, 0))
 
@@ -107,6 +121,7 @@ class GameManager:
         try:
             pos = self.bees[id].new_pos(direction)
             if self.hive.is_valid(pos):
+                print('pos:', pos[0], pos[1])
                 self.bees[id].move_bee(pos)
         except:
             pass
@@ -151,6 +166,10 @@ def main():
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
                 running = False
+                print("Waiting for Tornado")
+                game.tornado_target.stop()
+                game.tornado_thread.join(1)
+                print("Tornado joined")
 
         game.handle_input()
 
@@ -163,6 +182,8 @@ def main():
 
         time.sleep(0.04)
 
+    pygame.display.quit()
+    pygame.quit()
 
 # run the main function only if this module is executed as the main script
 # (if you import this as a module then nothing is executed)

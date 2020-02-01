@@ -15,7 +15,11 @@ def get_surface_pos(pos):
     width = 2 * RADIUS
     height = RADIUS * SQRT3
 
-    midy = (row - math.ceil(col / 2.0)) * height + (height / 2 if col % 2 == 1 else 0) + height/2
+    # midy = (row - math.ceil(col / 2.0)) * height + (height / 2 if col % 2 == 1 else 0) + height/2
+    # Alternate the offset of the cells based on column
+    offset = RADIUS * SQRT3 / 2 if col % 2 else 0
+    # Calculate the offset of the cell
+    midy = offset + SQRT3 * row * RADIUS + height/2
     midx = 1.5 * RADIUS * col + width/2
 
     return (midx, midy)
