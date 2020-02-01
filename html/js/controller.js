@@ -2,7 +2,7 @@ var id = Math.round(Math.random() * 10000000000);
 
 function post_to_server(dir) {
     var xhttp = new XMLHttpRequest();
-    var url = "http://10.48.254.146:8080";
+    var url = document.getElementById("ip").value;
     xhttp.open("POST", url, true);
     xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     xhttp.send("id=" + id + "&dir=" + dir);
