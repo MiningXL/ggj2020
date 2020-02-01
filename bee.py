@@ -59,7 +59,9 @@ class Bee:
 
     def new_pos(self, direction):
         pos = self.grid_pos
+        direction = direction[pos[1]%2]
         return (pos[0] + direction[0], pos[1] + direction[1])
+
 
     def move_bee(self, pos):
         self.grid_pos = pos
