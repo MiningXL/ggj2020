@@ -68,5 +68,5 @@ class Bee:
         self.grid_pos = pos
 
     def pick_up(self, item):
-        print('picked up:', item.__name__)
+        print('picked up:', type(item).__name__)
         self.item = item
