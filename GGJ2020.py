@@ -27,6 +27,8 @@ import colorsys
 
 pygame.init()
 
+current_path = os.path.dirname(__file__)
+
 # initialize the pygame module
 # load and set the logo
 pygame.display.set_caption("First Try")
@@ -56,6 +58,8 @@ class GameManager:
 
         self.bees = {
         }
+
+        self.thermometer = pygame.image.load(os.path.join(current_path, 'Thermometer.png'))
 
         self.queue = queue.Queue(maxsize=10)
 
@@ -181,9 +185,15 @@ class GameManager:
     def draw_temperature(self, surface=None):
         if surface is None:
             surface = self.screen
-        width = int(self.disp_width * 0.02)
+        width = 30
         height = max(0,int(self.temperature))
-        pygame.draw.rect(surface, (255,0,0), ((int(self.disp_width * 0.9),int(self.disp_height * 0.5)-height), (width, height)) )
+
+        thermometer_current = self.thermometer.copy()
+        pygame.draw.circle(thermometer_current, (255, 0, 0), (35, 273), 30)
+        pygame.draw.rect(thermometer_current, (255,0,0), ((22,247-height), (width,height)))
+        thermometer_current.blit(self.thermometer, ((0,0), (0, 0)))
+
+        surface.blit(thermometer_current, ((int(self.disp_width * 0.9),int(self.disp_height * 0.2)), (0, 0)))
 
 # define a main function
 def main():
