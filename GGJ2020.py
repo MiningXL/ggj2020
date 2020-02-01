@@ -1,10 +1,11 @@
 #   Global Game Jam 2020
 #   2020-01-31 bis 2020-02-03
 
-# im
+# import
 import os
 import pygame
 import numpy as np
+
 from map import Map
 from render import RenderGrid, RenderUnits, SQRT3
 import random
@@ -12,7 +13,7 @@ import random
 import time
 
 summen = True
-
+RADIUS = 40
 
 
 current_path = os.path.dirname(__file__)
@@ -23,7 +24,16 @@ class Bee:
         self.render_grid = render_grid
         self.id = id
         self.color = color
-        self.image = pygame.image.load(os.path.join(current_path, 'bee_small_2.png'))
+
+        self.image = pygame.image.load(os.path.join(current_path, 'bee_body.png'))
+        self.image = pygame.transform.scale(self.image, (2*RADIUS, 2*RADIUS))
+        color_bee = pygame.Surface(self.image.get_size()).convert_alpha()
+        color_bee.fill(self.color)
+
+        self.image.blit(color_bee, (0,0), special_flags = pygame.BLEND_RGBA_MULT)
+        line_bee = pygame.image.load(os.path.join(current_path, 'bee_lines.png'))
+        line_bee = pygame.transform.scale(line_bee, (2*RADIUS, 2*RADIUS))
+        self.image.blit(line_bee, (0, 0))
 
         self.surface_pos = self.render_grid.get_surface_pos(self.grid_pos) # current draw position of bee
 
@@ -110,8 +120,8 @@ def main():
     grid_vertical = 7
     m = Map(grid_horizontal, grid_vertical)
     # define Radius from gridsize and screensize
-    grid = RenderGrid(m, radius=40)
-    units = RenderUnits(m, radius=40)
+    grid = RenderGrid(m, radius = RADIUS)
+    units = RenderUnits(m, radius = RADIUS)
 
     bees = [Bee((3,3), grid, id=0, color=(255,0,0)) , Bee((5,1), grid, id=1, color=(0,255,0))]
 
