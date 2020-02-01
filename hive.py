@@ -14,13 +14,16 @@ class Hive:
         self.flowers_collected = 0
         self.intruders = []
         self.items = [self.flowers, self.intruders]
-        self.broken_cells = perlin.gen_perlin((self.rows, self.cols), 2, 100, 0.5, 1.5)
+        self.cell_state = perlin.gen_perlin((self.rows, self.cols), 2, 100, 0.5, 1.5)
 
     def is_valid(self, pos):
-        if (pos in self.cells) and (self.broken_cells[pos]):
+        if (pos in self.cells) and (self.cell_state[pos]):
             return True
         else:
             return False
+
+    def exists(self, pos):
+        return pos in self.cells
 
     def draw_grid(self, surface):
         """
@@ -49,7 +52,7 @@ class Hive:
             if col==3 and row == 4:
                 #pass
                 pygame.draw.polygon(surface, (0, 0, 255), points, 0)
-            elif self.broken_cells[cell]:
+            elif self.cell_state[cell]:
                 pygame.draw.polygon(surface, (255, 255, 0), points, 0)
             else:
                 pygame.draw.polygon(surface, (125, 125, 0), points, 0)

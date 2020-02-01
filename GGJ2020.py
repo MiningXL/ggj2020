@@ -136,9 +136,10 @@ class GameManager:
                     del self.bees[id]
                 except:
                     print("Kill Error")
-            elif cmd == 'action':
+            elif (cmd == 'action') and (id in self.bees):
                 self.pick_up(id)
                 self.drop(id)
+                self.repair_comb(id)
             else:
                 dir = html_dict[cmd]
                 if id in self.bees:
@@ -194,8 +195,16 @@ class GameManager:
             for i,item in enumerate(item_list):
                 if item.grid_pos == pos:
                     del item_list[i]
+                    self.bees[id].pick_up(item)
                     continue
-            self.bees[id].pick_up(item)
+
+    def repair_comb(self, id):
+        for i in html_dict:
+            pos = self.bees[id].new_pos(html_dict[i])
+            if self.hive.exists(pos):
+                if not self.hive.cell_state[pos]:
+                    self.hive.cell_state[pos] = 1
+                    return
 
     def draw_items(self, surface=None):
         if surface is None:
