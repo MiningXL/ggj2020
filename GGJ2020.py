@@ -8,7 +8,6 @@ import numpy as np
 import threading
 
 from map import Map
-from hive import draw_grid
 
 import random
 import queue
@@ -17,6 +16,7 @@ import time
 from bee import Bee
 from htmlhandler import make_app
 import tornado
+import hive
 
 pygame.init()
 
@@ -55,7 +55,9 @@ class GameManager:
         self.queue = queue.Queue(maxsize=10)
 
         self.webserver = make_app(self.queue)
-        self.webserver.listen(8080)
+        self.webserver.listen(8090)
+
+        self.hive = hive.Hive()
 
         threading.Thread(target=tornado.ioloop.IOLoop.current().start).start()
 
@@ -68,9 +70,7 @@ class GameManager:
             else:
                 dir = html_dict[cmd]
                 if id in self.bees:
-                    pos = self.bees[id].grid_pos
-                    pos = (pos[0] + dir[0], pos[1] + dir[1])
-                    self.bees[id].grid_pos = pos
+                    self.move_bee(id,dir)
                 else:
                     x = random.randint(0, self.map.rows)
                     y = random.randint(0, self.map.cols)
@@ -78,36 +78,38 @@ class GameManager:
 
     #surface.blit(grid, (0, 0))
 
-def draw_bees(surface, bees):
-    for bee in bees.values():
-        bee_pos_shift = (bee.surface_pos[0]-bee.image.get_height()/2,bee.surface_pos[1]-bee.image.get_width()/2)
-        surface.blit(bee.image, (bee_pos_shift,(0,0)))
+    def animate_bees(self):
+        # calculate next position on bee path
+        for bee in self.bees.values():
+            target_pos = np.array(bee.get_target_pos())
+            current_pos = np.array(bee.surface_pos)
+            path = target_pos - current_pos
+            #print(np.linalg.norm(path))
+            if np.linalg.norm(path) < 5:
+                #print("summen")
+                r = random.random()
+                dir = np.array([r, 1.0-r])
+                dir = dir/np.linalg.norm(dir)
+                amplitude = random.random() * 2
+                bee.surface_pos = current_pos + amplitude * dir
+            else:
+                #print("move")
+                step = 0.4
+                bee.surface_pos = current_pos + step * path
 
-    pass
-    #m.units[(0, 0)] = Unit(m)
-    #m.units[(3, 2)] = Unit(m)
-def move_bees(bees):
-    # calculate next position on bee path
-    for bee in bees.values():
-        target_pos = np.array(bee.get_target_pos())
-        current_pos = np.array(bee.surface_pos)
-        path = target_pos - current_pos
-        #print(np.linalg.norm(path))
-        if np.linalg.norm(path) < 5:
-            #print("summen")
-            r = random.random()
-            dir = np.array([r, 1.0-r])
-            dir = dir/np.linalg.norm(dir)
-            amplitude = random.random() * 2
-            bee.surface_pos = current_pos + amplitude * dir
-        else:
-            #print("move")
-            step = 0.4
-            bee.surface_pos = current_pos + step * path
+    def draw_bees(self, surface=None):
+        if surface is None:
+            surface = self.screen
+        for bee in self.bees.values():
+            bee.paint(surface)
 
-            #print(bee.surface_pos)
-
-    #pygame.draw.rect(surface, (255,0,0), ((50,50),(100,100)))
+    def move_bee(self, id, direction):
+        try:
+            pos = self.bees[id].new_pos(direction)
+            if self.hive.is_valid(pos):
+                self.bees[id].move_bee(pos)
+        except:
+            pass
 
 # define a main function
 def main():
@@ -143,11 +145,8 @@ def main():
             if event.type == pygame.KEYDOWN:
                 try:
                     xy_move = key_dict[event.key]
-                    pos = game.bees[xy_move[2]].grid_pos
-                    pos = (pos[0] + xy_move[0], pos[1] + xy_move[1])
-                    if game.map.valid_cell(pos):
-                        game.bees[xy_move[2]].grid_pos = pos
-                except KeyError:
+                    game.move_bee(xy_move[2],(xy_move[0], xy_move[1]))
+                except:
                     pass
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
@@ -155,9 +154,9 @@ def main():
 
         game.handle_input()
 
-        move_bees(game.bees)
-        draw_grid(game.screen, game.map)
-        draw_bees(game.screen, game.bees)
+        game.animate_bees()
+        game.hive.draw_grid(game.screen)
+        game.draw_bees()
 
         pygame.display.flip()
         # draw a line

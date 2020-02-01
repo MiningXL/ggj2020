@@ -1,29 +1,37 @@
 import pygame
 from constants import *
+import itertools as it
 
 # define secondary functions
-def draw_grid(surface, map):
-    surface.fill(pygame.Color('white'))
-    """
-    Draws a hex grid, based on the map object, onto this Surface
-    """
-    cell = [(.5 * RADIUS, 0),
-                 (1.5 * RADIUS, 0),
-                 (2 * RADIUS, SQRT3 / 2 * RADIUS),
-                 (1.5 * RADIUS, SQRT3 * RADIUS),
-                 (.5 * RADIUS, SQRT3 * RADIUS),
-                 (0, SQRT3 / 2 * RADIUS)]
+class Hive:
+    def __init__(self):
+        self.cells = list(it.product(range(5),range(5)))
 
-    # A point list describing a single cell, based on the radius of each hex
-    for col in range(map.cols):
-        # Alternate the offset of the cells based on column
-        offset = RADIUS * SQRT3 / 2 if col % 2 else 0
-        for row in range(map.rows):
+    def is_valid(self, pos):
+        return pos in self.cells
+
+    def draw_grid(self, surface):
+        """
+        Draws a hex grid, based on the map object, onto this Surface
+        """
+        surface.fill(pygame.Color('white'))
+        unit_cell = [(.5 * RADIUS, 0),
+                    (1.5 * RADIUS, 0),
+                    (2 * RADIUS, SQRT3 / 2 * RADIUS),
+                    (1.5 * RADIUS, SQRT3 * RADIUS),
+                    (.5 * RADIUS, SQRT3 * RADIUS),
+                    (0, SQRT3 / 2 * RADIUS)]
+
+        # A point list describing a single cell, based on the radius of each hex
+        for cell in self.cells:
+            col, row = cell
+            # Alternate the offset of the cells based on column
+            offset = RADIUS * SQRT3 / 2 if col % 2 else 0
             # Calculate the offset of the cell
             top = offset + SQRT3 * row * RADIUS
             left = 1.5 * col * RADIUS
             # Create a point list containing the offset cell
-            points = [(x + left, y + top) for (x, y) in cell]
+            points = [(x + left, y + top) for (x, y) in unit_cell]
             # Draw the polygon onto the surface
 
             if col==3 and row == 4:
@@ -33,3 +41,4 @@ def draw_grid(surface, map):
                 pygame.draw.polygon(surface, (255, 255, 0), points, 0)
 
             pygame.draw.polygon(surface, (0,0,0), points, 2)
+    

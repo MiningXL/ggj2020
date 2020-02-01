@@ -46,6 +46,16 @@ class Bee:
         return get_surface_pos(self.grid_pos)
 
     def paint(self, surface):
-        radius = surface.get_width() / 2
-        # draw Biene
-        surface.blit(self.image, ((int(radius), int(SQRT3 / 2 * radius)), (0, 0)))
+        bee_pos_shift = (self.surface_pos[0]-self.image.get_height()/2,self.surface_pos[1]-self.image.get_width()/2)
+        surface.blit(self.image, (bee_pos_shift,(0,0)))
+
+        # radius = surface.get_width() / 2
+        # # draw Biene
+        # surface.blit(self.image, ((int(radius), int(SQRT3 / 2 * radius)), (0, 0)))
+
+    def new_pos(self, direction):
+        pos = self.grid_pos
+        return (pos[0] + direction[0], pos[1] + direction[1])
+
+    def move_bee(self, pos):
+        self.grid_pos = pos
