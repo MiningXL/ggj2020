@@ -11,9 +11,7 @@ from map import Map
 from hive import draw_grid
 
 import random
-
 import queue
-
 import time
 
 from bee import Bee
@@ -57,9 +55,14 @@ class GameManager:
         while(not self.queue.empty()):
             id, dir = self.queue.get()
 
-            pos = self.bees[id].grid_pos
-            pos = (pos[0] + dir[0], pos[1] + dir[1])
-            self.bees[id].grid_pos = pos
+            if id in self.bees:
+                pos = self.bees[id].grid_pos
+                pos = (pos[0] + dir[0], pos[1] + dir[1])
+                self.bees[id].grid_pos = pos
+            else:
+                x = random.randint(0, self.map.rows)
+                y = random.randint(0, self.map.cols)
+                self.bees[id] = Bee((x,y), id=id, color=(random.randint(0,255), random.randint(0,255), random.randint(0,255)))
 
     #surface.blit(grid, (0, 0))
 
