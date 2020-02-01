@@ -23,7 +23,7 @@ function butt_top_right_click() {
     post_to_server("tr");
 }
 function butt_middle_click() {
-    alert(id);
+    post_to_server("action");
 }
 function butt_bottom_left_click() {
     post_to_server("bl");
