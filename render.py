@@ -29,8 +29,6 @@ class Render( pygame.Surface ):
 					( 0, SQRT3 / 2 * self.radius )
 		]
 
-
-
 	@property
 	def width( self ):
 		return	self.map.cols * self.radius * 1.5 + self.radius / 2.0
@@ -127,6 +125,20 @@ class RenderUnits( Render ):
 			unit.paint( surface )
 
 class RenderGrid( Render ):
+	def get_surface_pos(self, pos):
+		"""
+        Returns a subsurface corresponding to the surface, hopefully with trim_cell wrapped around the blit method.
+        """
+		row = pos[0]
+		col = pos[1]
+		width = 2 * self.radius
+		height = self.radius * SQRT3
+
+		midy = (row - math.ceil(col / 2.0)) * height + (height / 2 if col % 2 == 1 else 0) + height/2
+		midx = 1.5 * self.radius * col + width/2
+
+		return (midx, midy)
+
 	def draw( self ):
 		"""
 		Draws a hex grid, based on the map object, onto this Surface

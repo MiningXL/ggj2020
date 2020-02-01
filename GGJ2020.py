@@ -7,17 +7,40 @@ import pygame
 from map import Map
 from render import RenderGrid, RenderUnits, SQRT3
 
+current_path = os.path.dirname(__file__)
+
+class Bee:
+    def __init__(self, grid_pos, render_grid, id=None, color=None, image='bee_small_2.png'):
+        self.grid_pos = grid_pos
+        self.render_grid = render_grid
+        self.id = id
+        self.color = color
+        self.image = pygame.image.load(os.path.join(current_path, 'bee_small_2.png'))
+
+        self.surface_pos = self.render_grid.get_surface_pos(self.grid_pos) # current draw position of bee
+
+    def paint(self, surface):
+        radius = surface.get_width() / 2
+        # draw Biene
+        surface.blit(self.image, ((int(radius), int(SQRT3 / 2 * radius)), (0, 0)))
 
 
 # define secondary functions
-def _grid(surface, grid):
-
-
+def draw_grid(surface, grid):
     surface.fill(pygame.Color('white'))
     grid.draw()
 
     surface.blit(grid, (0, 0))
 
+def draw_bees(surface, bees, render_grid):
+    for bee in bees:
+        #target_pos = render_grid.get_surface_pos(bee.grid_pos)
+        #current_pos = bee.surface_pos
+        bee.surface_pos = render_grid.get_surface_pos(bee.grid_pos)
+        bee_pos_shift = (bee.surface_pos[0]-bee.image.get_height()/2,bee.surface_pos[1]-bee.image.get_width()/2)
+        surface.blit(bee.image, (bee_pos_shift,(0,0)))
+
+    pass
     #m.units[(0, 0)] = Unit(m)
     #m.units[(3, 2)] = Unit(m)
 
@@ -40,24 +63,55 @@ def main():
     # define a variable to control the main loop
     running = True
 
-    current_path = os.path.dirname(__file__)
 
-    grid_horizontal = 15
-    grid_vertical = 20
+
+    grid_horizontal = 7
+    grid_vertical = 7
     m = Map(grid_horizontal, grid_vertical)
-    grid = RenderGrid(m, radius=16)
-    units = RenderUnits(m, radius=16)
+    # define Radius from gridsize and screensize
+    grid = RenderGrid(m, radius=30)
+    units = RenderUnits(m, radius=30)
+
+    bees = [Bee((3,3), grid, id=1, color=(255,0,0))]
 
     # main loop
     while running:
-        _grid(screen, grid)
         #
         # event handling, gets all event from the event queue
         for event in pygame.event.get():
             # only do something if the event is of type QUIT
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:
+                    pos = bees[0].grid_pos
+                    # pos = (column, row)
+                    pos = (pos[0]-1, pos[1]-1)
+                    bees[0].grid_pos = pos
+                if event.key == pygame.K_e:
+                    pos = bees[0].grid_pos
+                    pos = (pos[0]-1, pos[1])
+                    bees[0].grid_pos = pos
+                if event.key == pygame.K_d:
+                    pos = bees[0].grid_pos
+                    pos = (pos[0], pos[1]+1)
+                    bees[0].grid_pos = pos
+                if event.key == pygame.K_x:
+                    pos = bees[0].grid_pos
+                    pos = (pos[0]+1, pos[1]+1)
+                    bees[0].grid_pos = pos
+                if event.key == pygame.K_y:
+                    pos = bees[0].grid_pos
+                    pos = (pos[0]+1, pos[1])
+                    bees[0].grid_pos = pos
+                if event.key == pygame.K_a:
+                    pos = bees[0].grid_pos
+                    pos = (pos[0], pos[1]-1)
+                    bees[0].grid_pos = pos
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
                 running = False
+
+        draw_grid(screen, grid)
+        draw_bees(screen, bees, grid)
 
         pygame.display.flip()
         # draw a line
