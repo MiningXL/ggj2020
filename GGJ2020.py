@@ -43,8 +43,12 @@ class Bee:
         self.image = pygame.transform.scale(self.image, (2*RADIUS, 2*RADIUS))
         color_bee = pygame.Surface(self.image.get_size()).convert_alpha()
         color_bee.fill(self.color)
-
         self.image.blit(color_bee, (0,0), special_flags = pygame.BLEND_RGBA_MULT)
+
+        wing_bee = pygame.image.load(os.path.join(current_path, 'bee_wings.png'))
+        wing_bee = pygame.transform.scale(wing_bee, (2*RADIUS, 2*RADIUS))
+        self.image.blit(wing_bee, (0, 0))
+
         line_bee = pygame.image.load(os.path.join(current_path, 'bee_lines.png'))
         line_bee = pygame.transform.scale(line_bee, (2*RADIUS, 2*RADIUS))
         self.image.blit(line_bee, (0, 0))
@@ -61,11 +65,39 @@ class Bee:
 
 
 # define secondary functions
-def draw_grid(surface, grid):
+def draw_grid(surface, grid, map):
     surface.fill(pygame.Color('white'))
-    grid.draw()
+    """
+    Draws a hex grid, based on the map object, onto this Surface
+    """
+    cell = [(.5 * RADIUS, 0),
+                 (1.5 * RADIUS, 0),
+                 (2 * RADIUS, SQRT3 / 2 * RADIUS),
+                 (1.5 * RADIUS, SQRT3 * RADIUS),
+                 (.5 * RADIUS, SQRT3 * RADIUS),
+                 (0, SQRT3 / 2 * RADIUS)]
 
-    surface.blit(grid, (0, 0))
+    # A point list describing a single cell, based on the radius of each hex
+    for col in range(map.cols):
+        # Alternate the offset of the cells based on column
+        offset = RADIUS * SQRT3 / 2 if col % 2 else 0
+        for row in range(map.rows):
+            # Calculate the offset of the cell
+            top = offset + SQRT3 * row * RADIUS
+            left = 1.5 * col * RADIUS
+            # Create a point list containing the offset cell
+            points = [(x + left, y + top) for (x, y) in cell]
+            # Draw the polygon onto the surface
+
+            if col==3 and row == 4:
+                #pass
+                pygame.draw.polygon(surface, (0, 0, 255), points, 0)
+            else:
+                pygame.draw.polygon(surface, (255, 255, 0), points, 0)
+
+            pygame.draw.polygon(surface, (0,0,0), points, 2)
+
+    #surface.blit(grid, (0, 0))
 
 def draw_bees(surface, bees, render_grid):
     for bee in bees:
@@ -190,7 +222,7 @@ def main():
                 # change the value to False, to exit the main loop
                 running = False
         move_bees(bees)
-        draw_grid(screen, grid)
+        draw_grid(screen, grid, m)
         draw_bees(screen, bees, grid)
 
         pygame.display.flip()
