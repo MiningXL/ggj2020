@@ -73,8 +73,8 @@ class GameManager:
 
         self.screen = pygame.display.set_mode((self.disp_width, self.disp_height))
 
-        self.grid_horizontal = 10
-        self.grid_vertical = 15
+        self.grid_horizontal = 29
+        self.grid_vertical = 40
 
         self.map = Map(self.grid_vertical, self.grid_horizontal)
 
@@ -99,7 +99,7 @@ class GameManager:
             self.bot = bot.Bot(self.bot_queue)
         self.flower_machine = FlowerMachine((3,3))
 
-        self.temperature = 50
+        self.temperature = 200
 
     def new_color(self):
         return tuple([255*i for i in colorsys.hsv_to_rgb(random.random(),1,1)])
@@ -243,7 +243,7 @@ class GameManager:
         pygame.draw.rect(thermometer_current, (255,0,0), ((22,247-height), (width,height)))
         thermometer_current.blit(self.thermometer, ((0,0), (0, 0)))
 
-        surface.blit(thermometer_current, ((int(self.disp_width * 0.9),int(self.disp_height * 0.2)), (0, 0)))
+        surface.blit(thermometer_current, ((int(self.disp_width * 0.95),int(self.disp_height * 0.2)), (0, 0)))
 
 # define a main function
 def main():

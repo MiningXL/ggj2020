@@ -30,7 +30,7 @@ class Hive:
         """
         Draws a hex grid, based on the map object, onto this Surface
         """
-        surface.fill(pygame.Color('white'))
+        surface.fill(pygame.Color('black'))
         unit_cell = [(.5 * RADIUS, 0),
                     (1.5 * RADIUS, 0),
                     (2 * RADIUS, SQRT3 / 2 * RADIUS),
