@@ -17,10 +17,10 @@ from bee import Bee
 from htmlhandler import make_app
 import tornado
 import hive
+from constants import *
 
 import bot
-from flower import Flower
-from intruder import Intruder
+from asset import Flower, Intruder
 from constants import FPS
 
 import colorsys
@@ -75,9 +75,6 @@ class GameManager:
         self.bot_queue = queue.Queue()
         self.bot = bot.Bot(self.bot_queue)
 
-        self.flowers = []
-        self.flowers_collected = 0
-        self.intruders = []
         self.temperature = 50
 
     def new_color(self):
@@ -95,13 +92,16 @@ class GameManager:
         color = self.new_color()
         self.bees.update({id: Bee((x,y), id=id, color=color)})
 
+        self.bot_queue = queue.Queue()
+        self.bot = bot.Bot(self.bot_queue)
+
     def handle_bot_queue(self):
         while(not self.bot_queue.empty()):
             item = self.bot_queue.get()
             if item == "flower":
-                self.flowers.append(Flower((0,0)))
+                self.hive.flowers.append(Flower((0,0)))
             if item == "intruder":
-                self.intruders.append(Intruder((0,0)))
+                self.hive.intruders.append(Intruder((0,0)))
 
     def handle_input(self):
         while(not self.queue.empty()):
@@ -112,6 +112,8 @@ class GameManager:
                     del self.bees[id]
                 except:
                     print("Kill Error")
+            elif cmd == 'action':
+                self.pick_up(id)
             else:
                 dir = html_dict[cmd]
                 if id in self.bees:
@@ -120,18 +122,6 @@ class GameManager:
                     self.add_bee(id)
 
     #surface.blit(grid, (0, 0))
-
-    def collect_flowers(self):
-        to_remove = set([])
-        for bee in self.bees.values():
-            for i,flower in enumerate(self.flowers):
-                if bee.grid_pos == flower.grid_pos:
-                    to_remove.add(i)
-        self.flowers_collected += len(to_remove)
-        if len(to_remove) > 0:
-            print("added %d flowers"%len(to_remove))
-        self.flowers = [f for i,f in enumerate(self.flowers) if i not in to_remove]
-
 
     def animate_bees(self):
         # calculate next position on bee path
@@ -167,17 +157,21 @@ class GameManager:
         except:
             pass
 
-    def draw_flowers(self, surface=None):
-        if surface is None:
-            surface = self.screen
-        for flower in self.flowers:
-            flower.paint(surface)
+    def pick_up(self, id):
+        pos = self.bees[id].grid_pos
+        for item_list in self.hive.items:
+            for i,item in enumerate(item_list):
+                if item.grid_pos == pos:
+                    del item_list[i]
+                    continue
+            self.bees[id].pick_up(item)
 
-    def draw_intruders(self, surface=None):
+    def draw_items(self, surface=None):
         if surface is None:
             surface = self.screen
-        for intruder in self.intruders:
-            intruder.paint(surface)
+        for item_list in self.hive.items:
+            for item in item_list:
+                item.paint(surface)
 
     def apply_temperature(self):
         self.temperature -= 0.1
@@ -243,15 +237,15 @@ def main():
 
         game.handle_input()
         game.handle_bot_queue()
-        game.collect_flowers()
         game.apply_temperature()
 
         game.animate_bees()
         game.hive.draw_grid(game.screen)
         game.draw_bees()
 
-        game.draw_flowers()
-        game.draw_intruders()
+        # game.draw_flowers()
+        # game.draw_intruders()
+        game.draw_items()
         game.draw_temperature()
 
         pygame.display.flip()
