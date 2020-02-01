@@ -55,8 +55,6 @@ class GameManager:
         self.map = Map(self.grid_vertical, self.grid_horizontal)
 
         self.bees = {
-            0: Bee((3,3), id=0, color=(255,0,0)) ,
-            1: Bee((5,1), id=1, color=(0,255,0))
         }
 
         self.queue = queue.Queue(maxsize=10)
@@ -76,6 +74,7 @@ class GameManager:
         self.flowers = []
         self.flowers_collected = 0
         self.intruders = []
+        self.temperature = 50
 
     def new_color(self):
         return tuple([255*i for i in colorsys.hsv_to_rgb(random.random(),1,1)])
@@ -159,7 +158,7 @@ class GameManager:
         try:
             pos = self.bees[id].new_pos(direction)
             if self.hive.is_valid(pos):
-                print('pos:', pos[0], pos[1])
+                self.temperature += 2/len(self.bees.keys())
                 self.bees[id].move_bee(pos)
         except:
             pass
@@ -175,6 +174,16 @@ class GameManager:
             surface = self.screen
         for intruder in self.intruders:
             intruder.paint(surface)
+
+    def apply_temperature(self):
+        self.temperature -= 0.1
+
+    def draw_temperature(self, surface=None):
+        if surface is None:
+            surface = self.screen
+        width = int(self.disp_width * 0.02)
+        height = max(0,int(self.temperature))
+        pygame.draw.rect(surface, (255,0,0), ((int(self.disp_width * 0.9),int(self.disp_height * 0.5)-height), (width, height)) )
 
 # define a main function
 def main():
@@ -225,6 +234,7 @@ def main():
         game.handle_input()
         game.handle_bot_queue()
         game.collect_flowers()
+        game.apply_temperature()
 
         game.animate_bees()
         game.hive.draw_grid(game.screen)
@@ -232,6 +242,7 @@ def main():
 
         game.draw_flowers()
         game.draw_intruders()
+        game.draw_temperature()
 
         pygame.display.flip()
         # draw a line
