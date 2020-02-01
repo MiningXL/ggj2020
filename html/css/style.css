@@ -34,4 +34,13 @@
 .hex.even {
   margin-top: 53px;
 }
+
+.grid {
+  position: absolute;
+  width: 400px;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translateY(-50%) translateX(-50%);
+          transform: translateY(-50%) translateX(-50%);
+}
 /*# sourceMappingURL=style.css.map */

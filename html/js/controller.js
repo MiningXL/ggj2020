@@ -7,9 +7,11 @@ function butt_top_click() {
 function butt_top_right_click() {
     alert("Top Right");
 }
+
 function butt_middle_click() {
     alert("Middle");
 }
+
 function butt_bottom_left_click() {
     alert("Bottom Left");
 }
