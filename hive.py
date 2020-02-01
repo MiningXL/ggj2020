@@ -1,6 +1,7 @@
 import pygame
 from constants import *
 import itertools as it
+import perlin
 
 # define secondary functions
 class Hive:
@@ -8,9 +9,13 @@ class Hive:
         self.rows = 5
         self.cols = 6
         self.cells = list(it.product(range(self.rows),range(self.cols)))
+        self.broken_cells = perlin.gen_perlin((self.rows, self.cols), 2, 100, 0.5, 1.5)
 
     def is_valid(self, pos):
-        return pos in self.cells
+        if (pos in self.cells) and (self.broken_cells[pos]):
+            return True
+        else:
+            return False
 
     def draw_grid(self, surface):
         """
@@ -39,8 +44,10 @@ class Hive:
             if col==3 and row == 4:
                 #pass
                 pygame.draw.polygon(surface, (0, 0, 255), points, 0)
-            else:
+            elif self.broken_cells[cell]:
                 pygame.draw.polygon(surface, (255, 255, 0), points, 0)
+            else:
+                pygame.draw.polygon(surface, (125, 125, 0), points, 0)
 
             pygame.draw.polygon(surface, (0,0,0), points, 2)
     
