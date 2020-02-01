@@ -180,7 +180,7 @@ class GameManager:
         if surface is None:
             surface = self.screen
         width = 30
-        height = max(0,int(self.temperature))
+        height = min(210,max(0,int(self.temperature)))
 
         thermometer_current = self.thermometer.copy()
         pygame.draw.circle(thermometer_current, (255, 0, 0), (35, 273), 30)
