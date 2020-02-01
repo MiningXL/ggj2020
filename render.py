@@ -156,13 +156,13 @@ class RenderGrid( Render ):
 				# Create a point list containing the offset cell
 				points = [( x + left, y + top ) for ( x, y ) in self.cell]
 				# Draw the polygon onto the surface
-				pygame.draw.polygon( self, self.GRID_COLOR, points, 1 )
+				pygame.draw.polygon( self, self.GRID_COLOR, points, 2 )
 
 class RenderFog( Render ):
 
-	OBSCURED = pygame.Color( 00, 00, 00, 0 )
-	SEEN	 = pygame.Color( 00, 00, 00, 0 )
-	VISIBLE	 = pygame.Color( 00, 00, 00, 0 )
+	OBSCURED = pygame.Color( 255, 00, 00, 128 )
+	SEEN	 = pygame.Color( 255, 00, 00, 128 )
+	VISIBLE	 = pygame.Color( 255, 00, 00, 128 )
 
 	def __init__( self, map, *args, **keywords ):
 

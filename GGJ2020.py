@@ -4,8 +4,16 @@
 # im
 import os
 import pygame
+import numpy as np
 from map import Map
 from render import RenderGrid, RenderUnits, SQRT3
+import random
+
+import time
+
+summen = True
+
+
 
 current_path = os.path.dirname(__file__)
 
@@ -36,15 +44,33 @@ def draw_bees(surface, bees, render_grid):
     for bee in bees:
         #target_pos = render_grid.get_surface_pos(bee.grid_pos)
         #current_pos = bee.surface_pos
-        bee.surface_pos = render_grid.get_surface_pos(bee.grid_pos)
+        #bee.surface_pos = render_grid.get_surface_pos(bee.grid_pos)
         bee_pos_shift = (bee.surface_pos[0]-bee.image.get_height()/2,bee.surface_pos[1]-bee.image.get_width()/2)
         surface.blit(bee.image, (bee_pos_shift,(0,0)))
 
     pass
     #m.units[(0, 0)] = Unit(m)
     #m.units[(3, 2)] = Unit(m)
+def move_bees(bees):
+    # calculate next position on bee path
+    for bee in bees:
+        target_pos = np.array(bee.render_grid.get_surface_pos(bee.grid_pos))
+        current_pos = np.array(bee.surface_pos)
+        path = target_pos - current_pos
+        #print(np.linalg.norm(path))
+        if np.linalg.norm(path) < 5:
+            #print("summen")
+            r = random.random()
+            dir = np.array([r, 1.0-r])
+            dir = dir/np.linalg.norm(dir)
+            amplitude = random.random() * 2
+            bee.surface_pos = current_pos + amplitude * dir
+        else:
+            #print("move")
+            step = 0.4
+            bee.surface_pos = current_pos + step * path
 
-
+            #print(bee.surface_pos)
 
     #pygame.draw.rect(surface, (255,0,0), ((50,50),(100,100)))
 
@@ -63,14 +89,12 @@ def main():
     # define a variable to control the main loop
     running = True
 
-
-
     grid_horizontal = 7
     grid_vertical = 7
     m = Map(grid_horizontal, grid_vertical)
     # define Radius from gridsize and screensize
-    grid = RenderGrid(m, radius=30)
-    units = RenderUnits(m, radius=30)
+    grid = RenderGrid(m, radius=40)
+    units = RenderUnits(m, radius=40)
 
     bees = [Bee((3,3), grid, id=1, color=(255,0,0))]
 
@@ -109,12 +133,14 @@ def main():
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
                 running = False
-
+        move_bees(bees)
         draw_grid(screen, grid)
         draw_bees(screen, bees, grid)
 
         pygame.display.flip()
         # draw a line
+
+        time.sleep(0.04)
 
 
 # run the main function only if this module is executed as the main script
