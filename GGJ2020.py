@@ -65,7 +65,7 @@ class Bee:
 
 
 # define secondary functions
-def draw_grid(surface, grid, map):
+def draw_grid(surface, map):
     surface.fill(pygame.Color('white'))
     """
     Draws a hex grid, based on the map object, onto this Surface
@@ -99,7 +99,7 @@ def draw_grid(surface, grid, map):
 
     #surface.blit(grid, (0, 0))
 
-def draw_bees(surface, bees, render_grid):
+def draw_bees(surface, bees):
     for bee in bees:
         bee_pos_shift = (bee.surface_pos[0]-bee.image.get_height()/2,bee.surface_pos[1]-bee.image.get_width()/2)
         surface.blit(bee.image, (bee_pos_shift,(0,0)))
@@ -222,8 +222,8 @@ def main():
                 # change the value to False, to exit the main loop
                 running = False
         move_bees(bees)
-        draw_grid(screen, grid, m)
-        draw_bees(screen, bees, grid)
+        draw_grid(screen, m)
+        draw_bees(screen, bees)
 
         pygame.display.flip()
         # draw a line
