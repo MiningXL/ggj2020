@@ -5,6 +5,7 @@
 import os
 import pygame
 import numpy as np
+import threading
 
 from map import Map
 
@@ -17,8 +18,23 @@ summen = True
 RADIUS = 40
 SQRT3 = math.sqrt( 3 )
 
+pygame.init()
+
+# initialize the pygame module
+# load and set the logo
+pygame.display.set_caption("First Try")
+
+# Define Screen Size
+disp_height = 600
+disp_width = 800
+screen = pygame.display.set_mode((disp_width, disp_height))
+
 
 current_path = os.path.dirname(__file__)
+
+
+import tornado.ioloop
+import tornado.web
 
 def get_surface_pos(pos):
     """
@@ -64,6 +80,27 @@ class Bee:
         # draw Biene
         surface.blit(self.image, ((int(radius), int(SQRT3 / 2 * radius)), (0, 0)))
 
+
+bees = [Bee((3,3), id=0, color=(255,0,0)) , Bee((5,1), id=1, color=(0,255,0))]
+
+
+class HelloHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.write("Hello bees")
+
+    def post(self):
+        var1 = self.get_argument("var1")
+        var2 = self.get_argument("var2")
+        print("Var1:", var1)
+        print("Var2:", var2)
+
+        for bee in bees:
+            bee.grid_pos = (bee.grid_pos[0] - 1, bee.grid_pos[1] + 1)
+
+def make_app():
+    return tornado.web.Application([
+        (r"/", HelloHandler),
+    ])
 
 # define secondary functions
 def draw_grid(surface, map):
@@ -133,15 +170,10 @@ def move_bees(bees):
 
 # define a main function
 def main():
-    # initialize the pygame module
-    pygame.init()
-    # load and set the logo
-    pygame.display.set_caption("First Try")
+    app = make_app()
+    app.listen(8080)
 
-    # Define Screen Size
-    disp_height = 600
-    disp_width = 800
-    screen = pygame.display.set_mode((disp_width, disp_height))
+    threading.Thread(target=tornado.ioloop.IOLoop.current().start).start()
 
     # Key Dictionary
     key_dict = {
@@ -169,11 +201,8 @@ def main():
 
     # define Radius from gridsize and screensize
 
-    bees = [Bee((3,3), id=0, color=(255,0,0)) , Bee((5,1), id=1, color=(0,255,0))]
-
     # main loop
     while running:
-        #
         # event handling, gets all event from the event queue
         for event in pygame.event.get():
             # only do something if the event is of type QUIT
