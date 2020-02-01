@@ -66,7 +66,7 @@ class FlowerMachine:
 
 
 class GameManager:
-    def __init__(self, telegram=True):
+    def __init__(self, telegram=False):
         # Define Screen Size
         self.disp_height = 1024
         self.disp_width = 1280
@@ -97,7 +97,7 @@ class GameManager:
         self.bot_queue = queue.Queue()
         if telegram:
             self.bot = bot.Bot(self.bot_queue)
-        self.flower_machine = FlowerMachine((3,3))
+        self.flower_machine = FlowerMachine((5,4))
 
         self.temperature = 200
 

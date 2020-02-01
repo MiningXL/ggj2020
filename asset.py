@@ -4,7 +4,7 @@ import math
 import random
 
 from constants import SQRT3, RADIUS
-from bee import get_surface_pos
+from helper import get_surface_pos
 
 current_path = os.path.dirname(__file__)
 

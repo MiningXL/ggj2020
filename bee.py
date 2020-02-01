@@ -1,28 +1,12 @@
 import pygame
 import os
-import math
+
+from helper import get_surface_pos
 
 from constants import *
+from asset import Flower, Wax
 
 current_path = os.path.dirname(__file__)
-
-def get_surface_pos(pos):
-    """
-    Returns a subsurface corresponding to the surface, hopefully with trim_cell wrapped around the blit method.
-    """
-    row = pos[0]
-    col = pos[1]
-    width = 2 * RADIUS
-    height = RADIUS * SQRT3
-
-    # midy = (row - math.ceil(col / 2.0)) * height + (height / 2 if col % 2 == 1 else 0) + height/2
-    # Alternate the offset of the cells based on column
-    offset = RADIUS * SQRT3 / 2 if col % 2 else 0
-    # Calculate the offset of the cell
-    midy = offset + SQRT3 * row * RADIUS + height/2
-    midx = 1.5 * RADIUS * col + width/2
-
-    return (midx, midy)
 
 class Bee:
     def __init__(self, grid_pos, id=None, color=None, image='bee_small_2.png'):
@@ -45,6 +29,12 @@ class Bee:
         line_bee = pygame.transform.scale(line_bee, (2*RADIUS, 2*RADIUS))
         self.image.blit(line_bee, (0, 0))
 
+        basket = pygame.image.load(os.path.join(current_path, 'BEE_Basket_Flowers.png'))
+        self.basket = pygame.transform.scale(basket, (2*RADIUS, 2*RADIUS))
+
+        wax = pygame.image.load(os.path.join(current_path, 'BEE_Wax.png'))
+        self.wax = pygame.transform.scale(wax, (2 * RADIUS, 2 * RADIUS))
+
         self.surface_pos = self.get_target_pos() # current draw position of bee
 
     def get_target_pos(self):
@@ -52,7 +42,14 @@ class Bee:
 
     def paint(self, surface):
         bee_pos_shift = (self.surface_pos[0]-self.image.get_height()/2,self.surface_pos[1]-self.image.get_width()/2)
-        surface.blit(self.image, (bee_pos_shift,(0,0)))
+
+        surface.blit(self.image, (bee_pos_shift, (0, 0)))
+
+        if isinstance(self.item, Flower):
+            surface.blit(self.basket, (bee_pos_shift, (0,0)))
+        if isinstance(self.item, Wax):
+            surface.blit(self.wax, (bee_pos_shift, (0,0)))
+
 
         # radius = surface.get_width() / 2
         # # draw Biene
