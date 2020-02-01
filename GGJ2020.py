@@ -21,6 +21,7 @@ import hive
 import bot
 from flower import Flower
 from intruder import Intruder
+from constants import FPS
 
 pygame.init()
 
@@ -197,9 +198,10 @@ def main():
     running = True
 
     # define Radius from gridsize and screensize
-
+    clock = pygame.time.Clock()
     # main loop
     while running:
+        clock.tick(FPS)
         # event handling, gets all event from the event queue
         for event in pygame.event.get():
             # only do something if the event is of type QUIT
@@ -230,8 +232,6 @@ def main():
 
         pygame.display.flip()
         # draw a line
-
-        time.sleep(0.04)
 
     pygame.display.quit()
     pygame.quit()
