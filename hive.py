@@ -1,8 +1,7 @@
 import pygame
 from constants import *
 import itertools as it
-from flower import Flower
-from intruder import Intruder
+from asset import Flower, Intruder
 
 # define secondary functions
 class Hive:
@@ -10,7 +9,7 @@ class Hive:
         self.rows = 5
         self.cols = 6
         self.cells = list(it.product(range(self.rows),range(self.cols)))
-        self.flowers = []
+        self.flowers = [Flower((1,1))]
         self.flowers_collected = 0
         self.intruders = []
         self.items = [self.flowers, self.intruders]
@@ -49,4 +48,3 @@ class Hive:
                 pygame.draw.polygon(surface, (255, 255, 0), points, 0)
 
             pygame.draw.polygon(surface, (0,0,0), points, 2)
-    

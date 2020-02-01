@@ -71,9 +71,6 @@ class GameManager:
         self.bot_queue = queue.Queue()
         self.bot = bot.Bot(self.bot_queue)
 
-        self.flowers = []
-        self.flowers_collected = 0
-        self.intruders = []
         self.temperature = 50
 
     def new_color(self):
@@ -122,18 +119,6 @@ class GameManager:
 
     #surface.blit(grid, (0, 0))
 
-    def collect_flowers(self):
-        to_remove = set([])
-        for bee in self.bees.values():
-            for i,flower in enumerate(self.flowers):
-                if bee.grid_pos == flower.grid_pos:
-                    to_remove.add(i)
-        self.flowers_collected += len(to_remove)
-        if len(to_remove) > 0:
-            print("added %d flowers"%len(to_remove))
-        self.flowers = [f for i,f in enumerate(self.flowers) if i not in to_remove]
-
-
     def animate_bees(self):
         # calculate next position on bee path
         for bee in self.bees.values():
@@ -176,18 +161,6 @@ class GameManager:
                     del item_list[i]
                     continue
             self.bees[id].pick_up(item)
-
-    def draw_flowers(self, surface=None):
-        if surface is None:
-            surface = self.screen
-        for flower in self.flowers:
-            flower.paint(surface)
-
-    def draw_intruders(self, surface=None):
-        if surface is None:
-            surface = self.screen
-        for intruder in self.intruders:
-            intruder.paint(surface)
 
     def draw_items(self, surface=None):
         if surface is None:
@@ -254,7 +227,6 @@ def main():
 
         game.handle_input()
         game.handle_bot_queue()
-        game.collect_flowers()
         game.apply_temperature()
 
         game.animate_bees()
