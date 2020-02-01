@@ -18,6 +18,10 @@ from htmlhandler import make_app
 import tornado
 import hive
 
+import bot
+from flower import Flower
+from intruder import Intruder
+
 pygame.init()
 
 # initialize the pygame module
@@ -34,7 +38,7 @@ html_dict = {
 }
 
 class GameManager:
-    
+
     def __init__(self):
         # Define Screen Size
         self.disp_height = 600
@@ -77,10 +81,25 @@ class GameManager:
         color = self.new_color()
         self.bees.update({id: Bee((x,y), id=id, color=color)})
 
+        self.bot_queue = queue.Queue()
+        self.bot = bot.Bot(self.bot_queue)
+
+        self.flowers = []
+        self.flowers_collected = 0
+        self.intruders = []
+
+    def handle_bot_queue(self):
+        while(not self.bot_queue.empty()):
+            item = self.bot_queue.get()
+            if item == "flower":
+                self.flowers.append(Flower((0,0)))
+            if item == "intruder":
+                self.intruders.append(Intruder((0,0)))
+
     def handle_input(self):
         while(not self.queue.empty()):
             id, cmd = self.queue.get()
-            
+
             if (cmd == "kill") and (id in self.bees):
                 del self.bees[id]
             else:
@@ -91,6 +110,18 @@ class GameManager:
                     self.add_bee(id)
 
     #surface.blit(grid, (0, 0))
+
+    def collect_flowers(self):
+        to_remove = set([])
+        for bee in self.bees.values():
+            for i,flower in enumerate(self.flowers):
+                if bee.grid_pos == flower.grid_pos:
+                    to_remove.add(i)
+        self.flowers_collected += len(to_remove)
+        if len(to_remove) > 0:
+            print("added %d flowers"%len(to_remove))
+        self.flowers = [f for i,f in enumerate(self.flowers) if i not in to_remove]
+
 
     def animate_bees(self):
         # calculate next position on bee path
@@ -125,6 +156,18 @@ class GameManager:
                 self.bees[id].move_bee(pos)
         except:
             pass
+
+    def draw_flowers(self, surface=None):
+        if surface is None:
+            surface = self.screen
+        for flower in self.flowers:
+            flower.paint(surface)
+
+    def draw_intruders(self, surface=None):
+        if surface is None:
+            surface = self.screen
+        for intruder in self.intruders:
+            intruder.paint(surface)
 
 # define a main function
 def main():
@@ -172,10 +215,15 @@ def main():
                 print("Tornado joined")
 
         game.handle_input()
+        game.handle_bot_queue()
+        game.collect_flowers()
 
         game.animate_bees()
         game.hive.draw_grid(game.screen)
         game.draw_bees()
+
+        game.draw_flowers()
+        game.draw_intruders()
 
         pygame.display.flip()
         # draw a line

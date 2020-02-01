@@ -30,8 +30,12 @@ class Intruder_Filter(BaseFilter):
 class Bot:
     def __init__(self, queue):
         self.queue = queue
-        with open("keyfile") as keyfile:
-            token = keyfile.read()
+        try:
+            with open("keyfile") as keyfile:
+                token = keyfile.read()
+        except:
+            print("wrong keyfile")
+            return None
         self.updater = Updater(token=token, use_context=True)
         self.dispatcher = self.updater.dispatcher
         start_handler = CommandHandler('start', self.start_message)
@@ -41,6 +45,7 @@ class Bot:
         self.add_intruder_handler()
         self.add_unknown_handler()
         self.start()
+        print("Bot started sucessfully")
 
 
     def unknown(self, update, context):
