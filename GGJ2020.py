@@ -67,6 +67,13 @@ class GameManager:
         self.tornado_thread = threading.Thread(target=self.tornado_target.start)
         self.tornado_thread.start()
 
+        self.bot_queue = queue.Queue()
+        self.bot = bot.Bot(self.bot_queue)
+
+        self.flowers = []
+        self.flowers_collected = 0
+        self.intruders = []
+
     def new_color(self):
         func = (random.randint(0,255) for i in range(3))
         return tuple(func)
@@ -80,13 +87,6 @@ class GameManager:
 
         color = self.new_color()
         self.bees.update({id: Bee((x,y), id=id, color=color)})
-
-        self.bot_queue = queue.Queue()
-        self.bot = bot.Bot(self.bot_queue)
-
-        self.flowers = []
-        self.flowers_collected = 0
-        self.intruders = []
 
     def handle_bot_queue(self):
         while(not self.bot_queue.empty()):
