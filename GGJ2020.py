@@ -108,7 +108,7 @@ class GameManager:
                     del self.bees[id]
                 except:
                     print("Kill Error")
-            elif cmd == 'action':
+            elif (cmd == 'action') and (id in self.bees):
                 self.pick_up(id)
             else:
                 dir = html_dict[cmd]
