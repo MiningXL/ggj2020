@@ -100,8 +100,11 @@ class GameManager:
         while(not self.queue.empty()):
             id, cmd = self.queue.get()
 
-            if (cmd == "kill") and (id in self.bees):
-                del self.bees[id]
+            if (cmd == "kill"):
+                try:
+                    del self.bees[id]
+                except:
+                    print("Kill Error")
             else:
                 dir = html_dict[cmd]
                 if id in self.bees:
