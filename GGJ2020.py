@@ -42,6 +42,29 @@ html_dict = {
     'bl': ((0, -1), (1,-1))
 }
 
+class FlowerMachine:
+    def __init__(self,pos):
+        self.input = pos
+        dir = html_dict['br'][pos[1]%2]
+        self.output = (pos[0] + dir[0], pos[1] + dir[1])
+
+        row = self.input[0]
+        col = self.input[1]
+        # Alternate the offset of the cells based on column
+        offset = RADIUS * SQRT3 / 2 if col % 2 else 0
+        # Calculate the offset of the cell
+        top = offset + SQRT3 * row * RADIUS
+        left = 1.5 * RADIUS * col
+
+        self.draw_pos = (left, top)
+
+        self.image = pygame.image.load(os.path.join(current_path, 'Flower_Machine.png'))
+        self.image = pygame.transform.scale(self.image, (int(3.5 * RADIUS),  int(1.5 * RADIUS * SQRT3)))
+
+    def draw(self, surface):
+        surface.blit(self.image, (self.draw_pos,(0,0)))
+
+
 class GameManager:
 
     def __init__(self):
@@ -74,6 +97,7 @@ class GameManager:
 
         self.bot_queue = queue.Queue()
         self.bot = bot.Bot(self.bot_queue)
+        self.flower_machine = FlowerMachine((3,3))
 
         self.temperature = 50
 
@@ -114,6 +138,7 @@ class GameManager:
                     print("Kill Error")
             elif cmd == 'action':
                 self.pick_up(id)
+                self.drop(id)
             else:
                 dir = html_dict[cmd]
                 if id in self.bees:
@@ -121,7 +146,13 @@ class GameManager:
                 else:
                     self.add_bee(id)
 
-    #surface.blit(grid, (0, 0))
+
+    def drop(self,id):
+        bee = self.bees[id]
+        if bee.grid_pos == self.flower_machine.input:
+            print("on correct position for drop")
+        else:
+            print("wrong position for drop")
 
     def animate_bees(self):
         # calculate next position on bee path
@@ -175,6 +206,9 @@ class GameManager:
 
     def apply_temperature(self):
         self.temperature -= 0.1
+
+    def draw_flower_machine(self):
+        self.flower_machine.draw(self.screen)
 
     def draw_temperature(self, surface=None):
         if surface is None:
@@ -247,6 +281,7 @@ def main():
         # game.draw_intruders()
         game.draw_items()
         game.draw_temperature()
+        game.draw_flower_machine()
 
         pygame.display.flip()
         # draw a line
