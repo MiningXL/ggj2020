@@ -32,6 +32,15 @@ screen = pygame.display.set_mode((disp_width, disp_height))
 
 current_path = os.path.dirname(__file__)
 
+# Key Dictionary
+html_dict = {
+    'tl': (-1, -1),
+    't': (-1, 0),
+    'tr': (0, 1),
+    'br': (1, 1),
+    'b': (1, 0),
+    'bl': (0, -1),
+}
 
 import tornado.ioloop
 import tornado.web
@@ -89,13 +98,16 @@ class HelloHandler(tornado.web.RequestHandler):
         self.write("Hello bees")
 
     def post(self):
-        var1 = self.get_argument("var1")
-        var2 = self.get_argument("var2")
-        print("Var1:", var1)
-        print("Var2:", var2)
+        id = int(self.get_argument("id"))
+        dir = self.get_argument("dir")
 
-        for bee in bees:
-            bee.grid_pos = (bee.grid_pos[0] - 1, bee.grid_pos[1] + 1)
+        print("id:", id)
+        print("dir:", dir)
+
+        xy_move = html_dict[dir]
+        pos = bees[id].grid_pos
+        pos = (pos[0] + xy_move[0], pos[1] + xy_move[1])
+        bees[id].grid_pos = pos
 
 def make_app():
     return tornado.web.Application([
