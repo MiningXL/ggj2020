@@ -95,9 +95,9 @@ class GameManager:
         while(not self.bot_queue.empty()):
             item = self.bot_queue.get()
             if item == "flower":
-                self.flowers.append(Flower((0,0)))
+                self.hive.flowers.append(Flower((0,0)))
             if item == "intruder":
-                self.intruders.append(Intruder((0,0)))
+                self.hive.intruders.append(Intruder((0,0)))
 
     def handle_input(self):
         while(not self.queue.empty()):
