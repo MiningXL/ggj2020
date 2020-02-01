@@ -13,8 +13,6 @@ import time
 
 summen = True
 
-
-
 current_path = os.path.dirname(__file__)
 
 class Bee:
@@ -25,7 +23,10 @@ class Bee:
         self.color = color
         self.image = pygame.image.load(os.path.join(current_path, 'bee_small_2.png'))
 
-        self.surface_pos = self.render_grid.get_surface_pos(self.grid_pos) # current draw position of bee
+        self.surface_pos = self.get_target_pos() # current draw position of bee
+
+    def get_target_pos(self):
+        return self.render_grid.get_surface_pos(self.grid_pos)
 
     def paint(self, surface):
         radius = surface.get_width() / 2
@@ -42,9 +43,6 @@ def draw_grid(surface, grid):
 
 def draw_bees(surface, bees, render_grid):
     for bee in bees:
-        #target_pos = render_grid.get_surface_pos(bee.grid_pos)
-        #current_pos = bee.surface_pos
-        #bee.surface_pos = render_grid.get_surface_pos(bee.grid_pos)
         bee_pos_shift = (bee.surface_pos[0]-bee.image.get_height()/2,bee.surface_pos[1]-bee.image.get_width()/2)
         surface.blit(bee.image, (bee_pos_shift,(0,0)))
 
@@ -54,7 +52,7 @@ def draw_bees(surface, bees, render_grid):
 def move_bees(bees):
     # calculate next position on bee path
     for bee in bees:
-        target_pos = np.array(bee.render_grid.get_surface_pos(bee.grid_pos))
+        target_pos = np.array(bee.get_target_pos())
         current_pos = np.array(bee.surface_pos)
         path = target_pos - current_pos
         #print(np.linalg.norm(path))
@@ -89,12 +87,12 @@ def main():
     # define a variable to control the main loop
     running = True
 
-    grid_horizontal = 7
-    grid_vertical = 7
+    grid_horizontal = 10
+    grid_vertical = 15
     m = Map(grid_horizontal, grid_vertical)
     # define Radius from gridsize and screensize
-    grid = RenderGrid(m, radius=40)
-    units = RenderUnits(m, radius=40)
+    grid = RenderGrid(m, radius=30)
+    units = RenderUnits(m, radius=30)
 
     bees = [Bee((3,3), grid, id=1, color=(255,0,0))]
 
@@ -109,27 +107,33 @@ def main():
                     pos = bees[0].grid_pos
                     # pos = (column, row)
                     pos = (pos[0]-1, pos[1]-1)
-                    bees[0].grid_pos = pos
+                    if m.valid_cell(pos):
+                        bees[0].grid_pos = pos
                 if event.key == pygame.K_e:
                     pos = bees[0].grid_pos
                     pos = (pos[0]-1, pos[1])
-                    bees[0].grid_pos = pos
+                    if m.valid_cell(pos):
+                        bees[0].grid_pos = pos
                 if event.key == pygame.K_d:
                     pos = bees[0].grid_pos
                     pos = (pos[0], pos[1]+1)
-                    bees[0].grid_pos = pos
+                    if m.valid_cell(pos):
+                        bees[0].grid_pos = pos
                 if event.key == pygame.K_x:
                     pos = bees[0].grid_pos
                     pos = (pos[0]+1, pos[1]+1)
-                    bees[0].grid_pos = pos
+                    if m.valid_cell(pos):
+                        bees[0].grid_pos = pos
                 if event.key == pygame.K_y:
                     pos = bees[0].grid_pos
                     pos = (pos[0]+1, pos[1])
-                    bees[0].grid_pos = pos
+                    if m.valid_cell(pos):
+                        bees[0].grid_pos = pos
                 if event.key == pygame.K_a:
                     pos = bees[0].grid_pos
                     pos = (pos[0], pos[1]-1)
-                    bees[0].grid_pos = pos
+                    if m.valid_cell(pos):
+                        bees[0].grid_pos = pos
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
                 running = False
