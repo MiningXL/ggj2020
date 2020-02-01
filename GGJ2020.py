@@ -68,8 +68,8 @@ class FlowerMachine:
 class GameManager:
     def __init__(self, telegram=True):
         # Define Screen Size
-        self.disp_height = 600
-        self.disp_width = 800
+        self.disp_height = 1024
+        self.disp_width = 1280
 
         self.screen = pygame.display.set_mode((self.disp_width, self.disp_height))
 
@@ -88,7 +88,7 @@ class GameManager:
         self.webserver = make_app(self.queue)
         self.webserver.listen(8090)
 
-        self.hive = hive.Hive()
+        self.hive = hive.Hive(self.grid_horizontal, self.grid_vertical)
 
         self.tornado_target = tornado.ioloop.IOLoop.current()
         self.tornado_thread = threading.Thread(target=self.tornado_target.start)

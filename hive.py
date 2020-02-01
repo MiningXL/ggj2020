@@ -6,9 +6,9 @@ import perlin
 
 # define secondary functions
 class Hive:
-    def __init__(self):
-        self.rows = 5
-        self.cols = 6
+    def __init__(self, rows, cols):
+        self.rows = rows
+        self.cols = cols
         self.cells = list(it.product(range(self.rows),range(self.cols)))
         self.flowers = [Flower((1,1))]
         self.flowers_collected = 0
