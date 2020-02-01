@@ -123,7 +123,12 @@ class GameManager:
         while(not self.bot_queue.empty()):
             item = self.bot_queue.get()
             if item == "flower":
-                self.hive.flowers.append(Flower((0,0)))
+                pos_found = False
+                while not pos_found:
+                    pos = (random.randint(0,self.hive.rows), random.randint(0,self.hive.cols))
+                    if self.hive.is_valid(pos):
+                        pos_found = True
+                        self.hive.flowers.append(Flower(pos))
             if item == "intruder":
                 self.hive.intruders.append(Intruder((0,0)))
 
