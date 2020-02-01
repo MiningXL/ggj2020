@@ -6,9 +6,10 @@ class HelloHandler(tornado.web.RequestHandler):
         self.write("Hello, world")
 
     def post(self):
-        user = self.get_argument("username")
-        passwd = self.get_argument("password")
-        self.write("Your username is %s and password is %s" % (user, passwd))
+        var1 = self.get_argument("var1")
+        var2 = self.get_argument("var2")
+        print("Var1:", var1)
+        print("Var2:", var2)
 
 def make_app():
     return tornado.web.Application([
