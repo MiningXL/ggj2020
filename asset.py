@@ -29,6 +29,10 @@ class Flower(Asset):
 
         super().__init__(grid_pos, imagename)
 
+class Wax(Asset):
+    def __init__(self, grid_pos, id=None, color=None, imagename="wax.png"):
+        super().__init__(grid_pos, imagename)
+
 class Intruder(Asset):
     def __init__(self, grid_pos, id=None, color=None, imagename="Vasp.png"):
         super().__init__(grid_pos, imagename)

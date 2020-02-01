@@ -1,7 +1,7 @@
 import pygame
 from constants import *
 import itertools as it
-from asset import Flower, Intruder
+from asset import Flower, Intruder, Wax
 import perlin
 
 # define secondary functions
@@ -13,7 +13,8 @@ class Hive:
         self.flowers = [Flower((1,1))]
         self.flowers_collected = 0
         self.intruders = []
-        self.items = [self.flowers, self.intruders]
+        self.wax = []
+        self.items = [self.flowers, self.intruders, self.wax]
         self.cell_state = perlin.gen_perlin((self.rows, self.cols), 2, 100, 0.5, 1.5)
 
     def is_valid(self, pos):

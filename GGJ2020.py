@@ -20,7 +20,7 @@ import hive
 from constants import *
 
 import bot
-from asset import Flower, Intruder
+from asset import Flower, Intruder, Wax
 from constants import FPS
 
 import colorsys
@@ -66,8 +66,7 @@ class FlowerMachine:
 
 
 class GameManager:
-
-    def __init__(self):
+    def __init__(self, telegram=True):
         # Define Screen Size
         self.disp_height = 600
         self.disp_width = 800
@@ -96,7 +95,8 @@ class GameManager:
         self.tornado_thread.start()
 
         self.bot_queue = queue.Queue()
-        self.bot = bot.Bot(self.bot_queue)
+        if telegram:
+            self.bot = bot.Bot(self.bot_queue)
         self.flower_machine = FlowerMachine((3,3))
 
         self.temperature = 50
@@ -151,7 +151,13 @@ class GameManager:
     def drop(self,id):
         bee = self.bees[id]
         if bee.grid_pos == self.flower_machine.input:
-            print("on correct position for drop")
+            if isinstance(bee.item, Flower):
+                print("flower dropped!")
+                bee.item = None
+
+                self.hive.wax.append(Wax(self.flower_machine.output))
+
+
         else:
             print("wrong position for drop")
 
@@ -199,12 +205,14 @@ class GameManager:
                     continue
 
     def repair_comb(self, id):
-        for i in html_dict:
-            pos = self.bees[id].new_pos(html_dict[i])
-            if self.hive.exists(pos):
-                if not self.hive.cell_state[pos]:
-                    self.hive.cell_state[pos] = 1
-                    return
+        if isinstance(self.bees[id].item, Wax):
+            for i in html_dict:
+                pos = self.bees[id].new_pos(html_dict[i])
+                if self.hive.exists(pos):
+                    if not self.hive.cell_state[pos]:
+                        self.hive.cell_state[pos] = 1
+                        self.bees[id].item = None
+                        return
 
     def draw_items(self, surface=None):
         if surface is None:
@@ -288,9 +296,9 @@ def main():
 
         # game.draw_flowers()
         # game.draw_intruders()
+        game.draw_flower_machine()
         game.draw_items()
         game.draw_temperature()
-        game.draw_flower_machine()
 
         pygame.display.flip()
         # draw a line
