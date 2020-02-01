@@ -103,8 +103,6 @@ class GameManager:
 
     def new_color(self):
         return tuple([255*i for i in colorsys.hsv_to_rgb(random.random(),1,1)])
-        # func = (random.randint(0,255) for i in range(3))
-        # return tuple(func)
 
     def add_bee(self, id):
         valied = False
@@ -152,19 +150,13 @@ class GameManager:
                 else:
                     self.add_bee(id)
 
-
     def drop(self,id):
         bee = self.bees[id]
         if bee.grid_pos == self.flower_machine.input:
             if isinstance(bee.item, Flower):
-                print("flower dropped!")
                 bee.item = None
 
                 self.hive.wax.append(Wax(self.flower_machine.output))
-
-
-        else:
-            print("wrong position for drop")
 
     def animate_bees(self):
         # calculate next position on bee path
