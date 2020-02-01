@@ -24,9 +24,17 @@ pygame.init()
 # load and set the logo
 pygame.display.set_caption("First Try")
 
+html_dict = {
+    'tl': (-1, -1),
+    't': (-1, 0),
+    'tr': (0, 1),
+    'br': (1, 1),
+    'b': (1, 0),
+    'bl': (0, -1)
+}
 
 class GameManager:
-
+    
     def __init__(self):
         # Define Screen Size
         self.disp_height = 600
@@ -53,16 +61,20 @@ class GameManager:
 
     def handle_input(self):
         while(not self.queue.empty()):
-            id, dir = self.queue.get()
-
-            if id in self.bees:
-                pos = self.bees[id].grid_pos
-                pos = (pos[0] + dir[0], pos[1] + dir[1])
-                self.bees[id].grid_pos = pos
+            id, cmd = self.queue.get()
+            
+            if (cmd == "kill") and (id in self.bees):
+                del self.bees[id]
             else:
-                x = random.randint(0, self.map.rows)
-                y = random.randint(0, self.map.cols)
-                self.bees[id] = Bee((x,y), id=id, color=(random.randint(0,255), random.randint(0,255), random.randint(0,255)))
+                dir = html_dict[cmd]
+                if id in self.bees:
+                    pos = self.bees[id].grid_pos
+                    pos = (pos[0] + dir[0], pos[1] + dir[1])
+                    self.bees[id].grid_pos = pos
+                else:
+                    x = random.randint(0, self.map.rows)
+                    y = random.randint(0, self.map.cols)
+                    self.bees[id] = Bee((x,y), id=id, color=(random.randint(0,255), random.randint(0,255), random.randint(0,255)))
 
     #surface.blit(grid, (0, 0))
 

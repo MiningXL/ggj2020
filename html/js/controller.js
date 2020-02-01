@@ -8,6 +8,11 @@ function post_to_server(dir) {
     xhttp.send("id=" + id + "&dir=" + dir);
 }
 
+window.onbeforeunload = function() {
+    this.post_to_server("kill");
+    return true;
+};
+
 function butt_top_left_click() {
     post_to_server("tl");
 }
