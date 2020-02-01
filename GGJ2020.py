@@ -23,6 +23,8 @@ from flower import Flower
 from intruder import Intruder
 from constants import FPS
 
+import colorsys
+
 pygame.init()
 
 # initialize the pygame module
@@ -76,8 +78,9 @@ class GameManager:
         self.intruders = []
 
     def new_color(self):
-        func = (random.randint(0,255) for i in range(3))
-        return tuple(func)
+        return tuple([255*i for i in colorsys.hsv_to_rgb(random.random(),1,1)])
+        # func = (random.randint(0,255) for i in range(3))
+        # return tuple(func)
 
     def add_bee(self, id):
         valied = False
@@ -234,6 +237,7 @@ def main():
         # draw a line
 
     pygame.display.quit()
+    game.bot.kill()
     pygame.quit()
 
 # run the main function only if this module is executed as the main script

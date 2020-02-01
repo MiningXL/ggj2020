@@ -96,6 +96,9 @@ class Bot:
     def start(self):
         self.updater.start_polling()
 
+    def kill(self):
+        self.updater.stop()
+
 if __name__ == "__main__":
     q = queue.Queue()
     bot = Bot(q)
