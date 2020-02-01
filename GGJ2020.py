@@ -21,6 +21,9 @@ import hive
 import bot
 from flower import Flower
 from intruder import Intruder
+from constants import FPS
+
+import colorsys
 
 pygame.init()
 
@@ -74,8 +77,9 @@ class GameManager:
         self.temperature = 50
 
     def new_color(self):
-        func = (random.randint(0,255) for i in range(3))
-        return tuple(func)
+        return tuple([255*i for i in colorsys.hsv_to_rgb(random.random(),1,1)])
+        # func = (random.randint(0,255) for i in range(3))
+        # return tuple(func)
 
     def add_bee(self, id):
         valied = False
@@ -206,9 +210,10 @@ def main():
     running = True
 
     # define Radius from gridsize and screensize
-
+    clock = pygame.time.Clock()
     # main loop
     while running:
+        clock.tick(FPS)
         # event handling, gets all event from the event queue
         for event in pygame.event.get():
             # only do something if the event is of type QUIT
@@ -242,9 +247,8 @@ def main():
         pygame.display.flip()
         # draw a line
 
-        time.sleep(0.04)
-
     pygame.display.quit()
+    game.bot.kill()
     pygame.quit()
 
 # run the main function only if this module is executed as the main script
