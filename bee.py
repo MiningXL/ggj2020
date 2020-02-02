@@ -29,11 +29,18 @@ class Bee:
         line_bee = pygame.transform.scale(line_bee, (2*RADIUS, 2*RADIUS))
         self.image.blit(line_bee, (0, 0))
 
+        dancing_bee = pygame.image.load(os.path.join(current_path, 'BEE_Dancing.png'))
+        dancing_bee = pygame.transform.scale(dancing_bee, (2 * RADIUS, 2 * RADIUS))
+
         self.dancing_sprites = [self.image]
         self.dancing_state = 0
-        for i in range(1,50):
-            dancing_state = pygame.transform.rotate(self.image, 360/50 * i)
-            self.dancing_sprites.append(dancing_state)
+        n_steps = 50
+        for i in range(1,n_steps):
+            dancing_body = pygame.transform.rotate(self.image, 360 / n_steps * i)
+            dancing_ovelay = pygame.transform.rotate(dancing_bee, 360 / n_steps * i)
+            if i//10 % 2:
+                dancing_body.blit(dancing_ovelay, (0,0))
+            self.dancing_sprites.append(dancing_body)
 
         basket = pygame.image.load(os.path.join(current_path, 'BEE_Basket_Flowers.png'))
         self.basket = pygame.transform.scale(basket, (2*RADIUS, 2*RADIUS))

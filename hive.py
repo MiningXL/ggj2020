@@ -7,6 +7,8 @@ import perlin
 # define secondary functions
 class Hive:
     def __init__(self, rows, cols):
+        print("rows = ", rows)
+        print("cols = ", cols)
         self.rows = rows
         self.cols = cols
         self.cells = list(it.product(range(self.rows),range(self.cols)))

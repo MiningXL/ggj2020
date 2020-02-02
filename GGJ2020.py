@@ -68,15 +68,15 @@ class FlowerMachine:
 class GameManager:
     def __init__(self, telegram=False):
         # Define Screen Size
-        self.disp_height = 1024
-        self.disp_width = 1280
+        self.disp_height = DISP_HEIGHT
+        self.disp_width = DISP_WIDTH
 
         self.screen = pygame.display.set_mode((self.disp_width, self.disp_height))
 
-        self.grid_horizontal = 29
-        self.grid_vertical = 40
+        self.grid_height = GRID_HEIGHT
+        self.grid_width = GRID_WIDTH
 
-        self.map = Map(self.grid_vertical, self.grid_horizontal)
+        self.map = Map(self.grid_height, self.grid_width)
 
         self.bees = {
         }
@@ -88,7 +88,7 @@ class GameManager:
         self.webserver = make_app(self.queue)
         self.webserver.listen(8090)
 
-        self.hive = hive.Hive(self.grid_horizontal, self.grid_vertical)
+        self.hive = hive.Hive(self.grid_height, self.grid_width)
 
         self.tornado_target = tornado.ioloop.IOLoop.current()
         self.tornado_thread = threading.Thread(target=self.tornado_target.start)
@@ -242,7 +242,7 @@ class GameManager:
         pygame.draw.rect(thermometer_current, (255,0,0), ((22,247-height), (width,height)))
         thermometer_current.blit(self.thermometer, ((0,0), (0, 0)))
 
-        surface.blit(thermometer_current, ((int(self.disp_width * 0.945),int(self.disp_height * 0.2)), (0, 0)))
+        surface.blit(thermometer_current, ((int(self.disp_width * 0.90),int(self.disp_height * 0.2)), (0, 0)))
 
 # define a main function
 def main():
