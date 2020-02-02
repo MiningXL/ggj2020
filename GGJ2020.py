@@ -44,7 +44,7 @@ class GameManager:
         self.t0 = time.time()
 
         # self.screen = pygame.display.set_mode((self.disp_width, self.disp_height))
-        self.screen = pygame.display.set_mode(flags=pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN)
 
         self.grid_height = GRID_HEIGHT
         self.grid_width = GRID_WIDTH
@@ -339,6 +339,8 @@ class GameManager:
 def main():
     subprocess.run(["mpv", "--fs", "BEE_Intro.mpg"])
 
+    reason = None
+
     game = GameManager()
     pygame.mixer.pre_init()
     pygame.mixer.init()
@@ -386,6 +388,8 @@ def main():
                     game.add_bee(random.randint(0,100))
                 if event.key == pygame.K_SPACE:
                     game.add_flower()
+                if event.key == pygame.K_ESCAPE:
+                    game_over = True
                 if event.key == pygame.K_0:
                     game.temperature_game_over = not game.temperature_game_over
                     if game.temperature_game_over:
@@ -424,7 +428,8 @@ def main():
         pygame.display.flip()
         # draw a line
 
-    time.sleep(7)
+    if reason is not None:
+        time.sleep(7)
 
     pygame.display.quit()
     if hasattr(game, 'bot'):
