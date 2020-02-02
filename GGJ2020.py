@@ -33,38 +33,6 @@ current_path = os.path.dirname(__file__)
 # load and set the logo
 pygame.display.set_caption("First Try")
 
-html_dict = {
-    'tl': ((-1, -1),(0, -1)),
-    't': ((-1, 0),(-1, 0)),
-    'tr': ((-1, 1),(0, 1)),
-    'br': ((0, 1),(1,1)),
-    'b': ((1, 0),(1,0)),
-    'bl': ((0, -1), (1,-1))
-}
-
-class FlowerMachine:
-    def __init__(self,pos):
-        self.input = pos
-        dir = html_dict['br'][pos[1]%2]
-        self.output = (pos[0] + dir[0], pos[1] + dir[1])
-
-        row = self.input[0]
-        col = self.input[1]
-        # Alternate the offset of the cells based on column
-        offset = RADIUS * SQRT3 / 2 if col % 2 else 0
-        # Calculate the offset of the cell
-        top = offset + SQRT3 * row * RADIUS
-        left = 1.5 * RADIUS * col
-
-        self.draw_pos = (left, top)
-
-        self.image = pygame.image.load(os.path.join(current_path, 'Flower_Machine.png'))
-        self.image = pygame.transform.scale(self.image, (int(3.5 * RADIUS),  int(1.5 * RADIUS * SQRT3)))
-
-    def draw(self, surface):
-        surface.blit(self.image, (self.draw_pos,(0,0)))
-
-
 class GameManager:
     def __init__(self, telegram=False):
         # Define Screen Size
@@ -97,7 +65,6 @@ class GameManager:
         self.bot_queue = queue.Queue()
         if telegram:
             self.bot = bot.Bot(self.bot_queue)
-        self.flower_machine = FlowerMachine((5,4))
 
         self.temperature = 200
 
@@ -113,9 +80,6 @@ class GameManager:
 
         color = self.new_color()
         self.bees.update({id: Bee((x,y), id=id, color=color)})
-
-        self.bot_queue = queue.Queue()
-        self.bot = bot.Bot(self.bot_queue)
 
     def handle_bot_queue(self):
         while(not self.bot_queue.empty()):
@@ -142,8 +106,8 @@ class GameManager:
             elif (cmd == 'action') and (id in self.bees):
                 self.dance(id)
                 self.repair_comb(id)
+                self.drop_wax(id)
                 self.pick_up(id)
-                self.drop(id)
             else:
                 dir = html_dict[cmd]
                 if id in self.bees:
@@ -155,13 +119,13 @@ class GameManager:
         bee = self.bees[id]
         bee.dance()
 
-    def drop(self,id):
+    def drop_wax(self,id):
         bee = self.bees[id]
-        if bee.grid_pos == self.flower_machine.input:
-            if isinstance(bee.item, Flower):
-                bee.item = None
-
-                self.hive.wax.append(Wax(self.flower_machine.output))
+        for fm in self.hive.flower_machines:
+            if bee.grid_pos == fm.input:
+                if isinstance(bee.item, Flower):
+                    bee.item = None
+                    self.hive.wax.append(Wax(fm.output))
 
     def animate_bees(self):
         # calculate next position on bee path
@@ -202,8 +166,17 @@ class GameManager:
             for i,item in enumerate(item_list):
                 if item.grid_pos == pos:
                     del item_list[i]
+                    self.drop(id)
                     self.bees[id].pick_up(item)
                     continue
+
+    def drop(self, id):
+        item = self.bees[id].item
+        if isinstance(item, Flower):
+            self.hive.flowers.append(Flower(self.bees[id].grid_pos))
+        elif isinstance(item, Wax):
+            self.hive.flowers.append(Wax(self.bees[id].grid_pos))
+        self.bees[id].item = None
 
     def repair_comb(self, id):
         if isinstance(self.bees[id].item, Wax):
@@ -229,7 +202,8 @@ class GameManager:
         self.temperature += float(total_dancers)/(total_bees+1) - 0.25
 
     def draw_flower_machine(self):
-        self.flower_machine.draw(self.screen)
+        for fm in self.hive.flower_machines:
+            fm.draw(self.screen)
 
     def draw_temperature(self, surface=None):
         if surface is None:
