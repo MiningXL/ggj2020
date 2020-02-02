@@ -73,6 +73,16 @@ class GameManager:
         self.temperature_game_over = temperature_game_over
         self.temperature_limits = [0, 210]
 
+        background_path = os.path.join(current_path, 'background_bees.ogg')
+        dance_path = os.path.join(current_path, 'wild_bees.ogg')
+
+        self.base_volume = 0
+        self.background_sound = pygame.mixer.Sound(background_path)
+        self.background_sound.set_volume(self.base_volume)
+        self.dance_sound = pygame.mixer.Sound(dance_path)
+        self.dance_sound.set_volume(self.base_volume)
+
+
     def new_color(self):
         # color = colorsys.hsv_to_rgb(random.random(),1,1)
         # return tuple([int(255*i) for i in color])
@@ -280,18 +290,26 @@ class GameManager:
         else:
             return False
 
+    def audio_settings(self):
+        num_bees = len(self.bees)
+        num_dancer = sum([bee.isdancer() for bee in self.bees])
+        self.background_sound.set_volume(self.audio_function(num_bees))
+        self.dance_sound.set_volume(self.audio_function(num_dancer))
+
+    def audio_function(self, x):
+        return self.base_volume + (1-self.base_volume)*min(1,x/10)
+
+
 # define a main function
 def main():
     game = GameManager()
-
-    sound_path = os.path.join(current_path, 'wild_bees.ogg')
 
     pygame.mixer.pre_init()
     pygame.mixer.init()
     # pygame.mixer.music.load(sound_path)
 
-    background_sound = pygame.mixer.Sound(sound_path)
-    pygame.mixer.Channel(1).play(background_sound)
+    pygame.mixer.Channel(1).play(game.background_sound, loops=-1)
+    pygame.mixer.Channel(1).play(game.dance_sound, loops=-1)
 
     # Key Dictionary
     key_dict = {
@@ -342,6 +360,7 @@ def main():
         game.handle_input()
         game.handle_bot_queue()
         game.apply_temperature()
+        game.audio_settings()
 
         game.draw_temperature()
 
