@@ -38,6 +38,14 @@ class Hive:
                     (.5 * RADIUS, SQRT3 * RADIUS),
                     (0, SQRT3 / 2 * RADIUS)]
 
+        r = RADIUS*0.75
+        unit_cell_inner = [(.5 * r, 0),
+                     (1.5 * r, 0),
+                     (2 * r, SQRT3 / 2 * r),
+                     (1.5 * r, SQRT3 * r),
+                     (.5 * r, SQRT3 * r),
+                     (0, SQRT3 / 2 * r)]
+
         # A point list describing a single cell, based on the radius of each hex
         for cell in self.cells:
             row, col = cell
@@ -48,13 +56,14 @@ class Hive:
             left = 1.5 * col * RADIUS
             # Create a point list containing the offset cell
             points = [(x + left, y + top) for (x, y) in unit_cell]
+            points_inner = [(RADIUS/4 + x + left, RADIUS/4 + y + top) for (x, y) in unit_cell_inner]
             # Draw the polygon onto the surface
 
             if col==3 and row == 4:
-                #pass
                 pygame.draw.polygon(surface, (0, 0, 255), points, 0)
             elif self.cell_state[cell]:
-                pygame.draw.polygon(surface, (255, 255, 0), points, 0)
+                pygame.draw.polygon(surface, (255, 204, 0), points, 0)
+                pygame.draw.polygon(surface, (255, 255, 0), points_inner, 0)
             else:
                 pygame.draw.polygon(surface, (125, 125, 0), points, 0)
 
