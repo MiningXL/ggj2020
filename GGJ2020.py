@@ -140,15 +140,20 @@ class GameManager:
                 except:
                     print("Kill Error")
             elif (cmd == 'action') and (id in self.bees):
+                self.dance(id)
+                self.repair_comb(id)
                 self.pick_up(id)
                 self.drop(id)
-                self.repair_comb(id)
             else:
                 dir = html_dict[cmd]
                 if id in self.bees:
                     self.move_bee(id,dir)
                 else:
                     self.add_bee(id)
+
+    def dance(self, id):
+        bee = self.bees[id]
+        bee.dance()
 
     def drop(self,id):
         bee = self.bees[id]
@@ -187,7 +192,6 @@ class GameManager:
         try:
             pos = self.bees[id].new_pos(direction)
             if self.hive.is_valid(pos):
-                self.temperature += 2/len(self.bees.keys())
                 self.bees[id].move_bee(pos)
         except:
             pass
@@ -219,7 +223,10 @@ class GameManager:
                 item.paint(surface)
 
     def apply_temperature(self):
-        self.temperature -= 0.1
+        total_dancers = sum(bee.isdancer() for bee in self.bees.values())
+        total_bees = len(self.bees)
+
+        self.temperature += float(total_dancers)/(total_bees+1) - 0.25
 
     def draw_flower_machine(self):
         self.flower_machine.draw(self.screen)
@@ -275,6 +282,8 @@ def main():
                     game.move_bee(xy_move[2],(xy_move[0], xy_move[1]))
                 except:
                     pass
+                if event.key == pygame.K_PLUS:
+                    game.add_bee(random.randint(0,100))
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
                 running = False

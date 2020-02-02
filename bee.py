@@ -4,7 +4,7 @@ import os
 from helper import get_surface_pos
 
 from constants import *
-from asset import Flower, Wax
+from asset import Flower, Wax, Dancer
 
 current_path = os.path.dirname(__file__)
 
@@ -29,6 +29,12 @@ class Bee:
         line_bee = pygame.transform.scale(line_bee, (2*RADIUS, 2*RADIUS))
         self.image.blit(line_bee, (0, 0))
 
+        self.dancing_sprites = [self.image]
+        self.dancing_state = 0
+        for i in range(1,50):
+            dancing_state = pygame.transform.rotate(self.image, 360/50 * i)
+            self.dancing_sprites.append(dancing_state)
+
         basket = pygame.image.load(os.path.join(current_path, 'BEE_Basket_Flowers.png'))
         self.basket = pygame.transform.scale(basket, (2*RADIUS, 2*RADIUS))
 
@@ -43,13 +49,17 @@ class Bee:
     def paint(self, surface):
         bee_pos_shift = (self.surface_pos[0]-self.image.get_height()/2,self.surface_pos[1]-self.image.get_width()/2)
 
-        surface.blit(self.image, (bee_pos_shift, (0, 0)))
+        if self.isdancer():
+            # dancing animation
+            surface.blit(self.dancing_sprites[self.dancing_state], (bee_pos_shift, (0, 0)))
+            self.dancing_state = (self.dancing_state + 1 ) % len(self.dancing_sprites)
+        else:
+            surface.blit(self.image, (bee_pos_shift, (0, 0)))
 
         if isinstance(self.item, Flower):
             surface.blit(self.basket, (bee_pos_shift, (0,0)))
         if isinstance(self.item, Wax):
             surface.blit(self.wax, (bee_pos_shift, (0,0)))
-
 
         # radius = surface.get_width() / 2
         # # draw Biene
@@ -62,8 +72,20 @@ class Bee:
 
 
     def move_bee(self, pos):
-        self.grid_pos = pos
+        if not isinstance(self.item, Dancer):   # dancing bees cannot move
+            self.grid_pos = pos
 
     def pick_up(self, item):
         print('picked up:', type(item).__name__)
         self.item = item
+
+    def dance(self):
+        if self.item is None:
+            print("I am the dancing bee")
+            self.item = Dancer(self.grid_pos)
+        elif self.isdancer():
+            print("stop dancing")
+            self.item = None
+
+    def isdancer(self):
+        return isinstance(self.item, Dancer)

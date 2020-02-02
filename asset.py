@@ -36,3 +36,7 @@ class Wax(Asset):
 class Intruder(Asset):
     def __init__(self, grid_pos, id=None, color=None, imagename="Vasp.png"):
         super().__init__(grid_pos, imagename)
+
+class Dancer(Asset):
+    def __init__(self, grid_pos, id=None, color=None, imagename="wax.png"):
+        super().__init__(grid_pos, imagename)

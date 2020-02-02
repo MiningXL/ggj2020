@@ -3,7 +3,7 @@ import tornado.web
 
 class HTMLHandler(tornado.web.RequestHandler):
     def initialize(self, queue):
-        print("HelloHandler")
+        #print("HelloHandler")
         self.queue = queue
 
     def get(self):
@@ -13,8 +13,8 @@ class HTMLHandler(tornado.web.RequestHandler):
         id = int(self.get_argument("id"))
         dir = self.get_argument("dir")
 
-        print("id:", id)
-        print("dir:", dir)
+        #print("id:", id)
+        #print("dir:", dir)
 
         self.queue.put((id,dir))
 
