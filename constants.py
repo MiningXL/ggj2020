@@ -2,11 +2,11 @@ import math
 from enum import Enum
 
 
-DISP_HEIGHT = 600
-DISP_WIDTH = 800
+DISP_HEIGHT = 1024
+DISP_WIDTH = 1280
 
-GRID_HEIGHT = 11
-GRID_WIDTH = 20
+GRID_HEIGHT = 40
+GRID_WIDTH = 50
 
 # width: 1.65
 # height: 1.8

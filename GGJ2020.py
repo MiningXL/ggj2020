@@ -53,7 +53,17 @@ class GameManager:
         }
 
         self.thermometer = pygame.image.load(os.path.join(current_path, 'Thermometer_grey.png'))
-        self.game_over_1 = pygame.image.load(os.path.join(current_path, 'BEE_Honey.png'))
+        self.game_over_win = pygame.image.load(os.path.join(current_path, 'Game_Finished_Repaired.png'))
+        self.game_over_heat = pygame.image.load(os.path.join(current_path, 'Game_Finished_T_high.png'))
+        self.game_over_cold = pygame.image.load(os.path.join(current_path, 'Game_Finished_T_low.png'))
+
+        h = self.game_over_win.get_height()
+        w = self.game_over_win.get_width()
+        scale = min(0.8 * DISP_HEIGHT/h, 0.8 * DISP_WIDTH/w)
+
+        self.game_over_win = pygame.transform.scale(self.game_over_win, (int(w * scale), int(h * scale)))
+        self.game_over_heat = pygame.transform.scale(self.game_over_heat, (int(w * scale), int(h * scale)))
+        self.game_over_cold = pygame.transform.scale(self.game_over_cold, (int(w * scale), int(h * scale)))
 
         self.queue = queue.Queue(maxsize=10)
 
@@ -70,7 +80,7 @@ class GameManager:
         if telegram:
             self.bot = bot.Bot(self.bot_queue)
 
-        self.temperature = 15
+        self.temperature = 150
         self.temperature_game_over = temperature_game_over
         self.temperature_limits = [0, 210]
 
@@ -274,20 +284,20 @@ class GameManager:
         elif self.temperature_game_over:
             if self.temperature <= self.temperature_limits[0]:
                 print("Bees froze to death!")
-                return (True, 'HEAT')
+                return (True, 'COLD')
             elif self.temperature >= self.temperature_limits[1]:
                 print("Bees suffocated to the heat!")
-                return (True, 'COLD')
+                return (True, 'HEAT')
         return (False, None)
 
     def draw_game_over(self, reason):
         if reason == 'WIN':
-            pass
+            self.screen.blit(self.game_over_win, ((DISP_WIDTH/10, DISP_HEIGHT/10), (0,0)))
         elif reason == 'HEAT':
-            pass
+            self.screen.blit(self.game_over_heat, ((DISP_WIDTH/10, DISP_HEIGHT/10), (0,0)))
         elif reason == 'COLD':
             pass
-            self.screen.blit(self.game_over_1, ((0,0), (0,0)))
+            self.screen.blit(self.game_over_cold, ((DISP_WIDTH/10, DISP_HEIGHT/10), (0,0)))
 
 # define a main function
 def main():
@@ -372,7 +382,7 @@ def main():
         pygame.display.flip()
         # draw a line
 
-    time.sleep(3)
+    time.sleep(5)
 
     pygame.display.quit()
     if hasattr(game, 'bot'):
