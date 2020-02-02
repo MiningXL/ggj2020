@@ -87,7 +87,7 @@ class GameManager:
         background_path = os.path.join(current_path, 'background_bees.ogg')
         dance_path = os.path.join(current_path, 'wild_bees.ogg')
 
-        self.base_volume = 0
+        self.base_volume = 0.5
         self.background_sound = pygame.mixer.Sound(background_path)
         self.background_sound.set_volume(self.base_volume)
         self.dance_sound = pygame.mixer.Sound(dance_path)
@@ -311,7 +311,7 @@ class GameManager:
 
     def audio_settings(self):
         num_bees = len(self.bees)
-        num_dancer = sum([bee.isdancer() for bee in self.bees])
+        num_dancer = sum([bee.isdancer() for bee in self.bees.values()])
         self.background_sound.set_volume(self.audio_function(num_bees))
         self.dance_sound.set_volume(self.audio_function(num_dancer))
 
@@ -369,6 +369,12 @@ def main():
                     game.add_bee(random.randint(0,100))
                 if event.key == pygame.K_SPACE:
                     game.add_flower()
+                if event.key == pygame.K_0:
+                    game.temperature_game_over = not game.temperature_game_over
+                    if game.temperature_game_over:
+                        print("disable game over")
+                    else:
+                        print("enable game over")
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
                 game_over = True
@@ -401,7 +407,7 @@ def main():
         pygame.display.flip()
         # draw a line
 
-    time.sleep(5)
+    time.sleep(7)
 
     pygame.display.quit()
     if hasattr(game, 'bot'):
