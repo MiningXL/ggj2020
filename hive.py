@@ -24,7 +24,8 @@ class Hive:
         self.items = [self.flowers, self.intruders, self.wax, self.weapons]
         self.cell_state = perlin.gen_perlin((self.rows, self.cols), 2, 100, 0.5, 1.5)
         self.platform = pygame.image.load(os.path.join(current_path, 'Platform.png'))
-        self.place_flower_machine()
+        for i in range(4):
+            self.place_flower_machine()
 
         self.flower_spawn_pos = [(self.rows-1, i) for i in range(int(self.cols/4),int(self.cols/4)+9)]
 
