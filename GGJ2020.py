@@ -34,7 +34,7 @@ current_path = os.path.dirname(__file__)
 pygame.display.set_caption("First Try")
 
 class GameManager:
-    def __init__(self, telegram=False, temperature_game_over=False):
+    def __init__(self, telegram=False, temperature_game_over=True):
         # Define Screen Size
         self.disp_height = DISP_HEIGHT
         self.disp_width = DISP_WIDTH
@@ -212,7 +212,7 @@ class GameManager:
         total_bees = len(self.bees)
 
         self.temperature += float(total_dancers)/(total_bees+1) - 0.25
-        self.temperature = max(self.temperature, 0)
+        self.temperature = min(max(self.temperature, self.temperature_limits[0]), self.temperature_limits[1])
 
     def draw_flower_machine(self):
         for fm in self.hive.flower_machines:
@@ -254,7 +254,7 @@ class GameManager:
             if self.temperature <= self.temperature_limits[0]:
                 print("Bees froze to death!")
                 return True
-            elif self.temperature > self.temperature_limits[1]:
+            elif self.temperature >= self.temperature_limits[1]:
                 print("Bees suffocated to the heat!")
                 return True
         else:
