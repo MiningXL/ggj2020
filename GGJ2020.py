@@ -34,10 +34,12 @@ current_path = os.path.dirname(__file__)
 pygame.display.set_caption("First Try")
 
 class GameManager:
-    def __init__(self, telegram=False):
+    def __init__(self, telegram=False, temperature_game_over=False):
         # Define Screen Size
         self.disp_height = DISP_HEIGHT
         self.disp_width = DISP_WIDTH
+
+        self.t0 = time.time()
 
         self.screen = pygame.display.set_mode((self.disp_width, self.disp_height))
 
@@ -66,7 +68,9 @@ class GameManager:
         if telegram:
             self.bot = bot.Bot(self.bot_queue)
 
-        self.temperature = 200
+        self.temperature = 60
+        self.temperature_game_over = temperature_game_over
+        self.temperature_limits = [0, 210]
 
     def new_color(self):
         return tuple([255*i for i in colorsys.hsv_to_rgb(random.random(),1,1)])
@@ -203,6 +207,7 @@ class GameManager:
         total_bees = len(self.bees)
 
         self.temperature += float(total_dancers)/(total_bees+1) - 0.25
+        self.temperature = max(self.temperature, 0)
 
     def draw_flower_machine(self):
         for fm in self.hive.flower_machines:
@@ -214,6 +219,22 @@ class GameManager:
         width = 30
         height = min(210,max(0,int(self.temperature)))
 
+        # temperature warning
+        if self.temperature > self.temperature_limits[1]*0.7:
+            speedup = (self.temperature-self.temperature_limits[1]*0.7) // 5
+            freq = (time.time() - self.t0 )
+            warning_level = max(0,int( 255 * (np.sin(freq * speedup))))
+            self.screen.fill((0, 0, warning_level))
+            self.screen.fill((warning_level, 0, 0))
+        elif self.temperature < self.temperature_limits[1]*0.3:
+            speedup = 1+(self.temperature_limits[1]*0.3-self.temperature)// 5
+            freq = (time.time() - self.t0 )
+            warning_level = max(0,int( 255 * (np.sin(freq * speedup))))
+            self.screen.fill((0, 0, warning_level))
+        else:
+            self.screen.fill((0, 0, 0))
+        #print(self.temperature)
+
         thermometer_current = self.thermometer.copy()
         pygame.draw.circle(thermometer_current, (255, 0, 0), (35, 273), 30)
         pygame.draw.rect(thermometer_current, (255,0,0), ((22,247-height), (width,height)))
@@ -224,6 +245,13 @@ class GameManager:
     def check_game_over(self):
         if sum(state == 0 for state in self.hive.cell_state.values()) == 0:
             return True
+        elif self.temperature_game_over:
+            if self.temperature <= self.temperature_limits[0]:
+                print("Bees froze to death!")
+                return True
+            elif self.temperature > self.temperature_limits[1]:
+                print("Bees suffocated to the heat!")
+                return True
         else:
             return False
 
@@ -271,7 +299,7 @@ def main():
                     game.add_flower()
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
-                running = False
+                game_over = False
                 print("Waiting for Tornado")
                 game.tornado_target.stop()
                 game.tornado_thread.join(1)
@@ -281,16 +309,15 @@ def main():
         game.handle_bot_queue()
         game.apply_temperature()
 
+        game.draw_temperature()
+
         game.animate_bees()
         game.hive.draw_grid(game.screen)
         game.draw_flower_machine()
         game.draw_bees()
 
-        # game.draw_flowers()
-        # game.draw_intruders()
         game.draw_flower_machine()
         game.draw_items()
-        game.draw_temperature()
 
         game_over = game.check_game_over()
 
@@ -298,7 +325,8 @@ def main():
         # draw a line
 
     pygame.display.quit()
-    game.bot.kill()
+    if hasattr(game, 'bot'):
+        game.bot.kill()
     pygame.quit()
 
 # run the main function only if this module is executed as the main script
