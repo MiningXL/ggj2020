@@ -4,7 +4,7 @@ import os
 from helper import get_surface_pos
 
 from constants import *
-from asset import Flower, Wax, Dancer
+from asset import Flower, Wax, Dancer, Weapon
 
 current_path = os.path.dirname(__file__)
 
@@ -55,6 +55,9 @@ class Bee:
         helmet = pygame.image.load(os.path.join(current_path, 'BEE_helmet_orange.png'))
         self.helmet = pygame.transform.scale(helmet, (2 * RADIUS, 2 * RADIUS))
 
+        weapon = pygame.image.load(os.path.join(current_path, 'BEE_weapon.png'))
+        self.weapon = pygame.transform.scale(weapon, (2 * RADIUS, 2 * RADIUS))
+
         self.surface_pos = self.get_target_pos() # current draw position of bee
 
     def get_target_pos(self):
@@ -75,6 +78,8 @@ class Bee:
         if isinstance(self.item, Wax):
             surface.blit(self.wax, (bee_pos_shift, (0, 0)))
             surface.blit(self.helmet, (bee_pos_shift, (0,0)))
+        if isinstance(self.item, Weapon):
+            surface.blit(self.weapon, (bee_pos_shift, (0,0)))
 
         # radius = surface.get_width() / 2
         # # draw Biene
