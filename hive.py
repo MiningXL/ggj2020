@@ -35,12 +35,26 @@ class Hive:
 
     def place_flower_machine(self):
         while True:
-            pos = random.randint(0,self.rows), random.randint(0,self.cols)
-            if not self.is_valid(pos):
-                continue
+            pos = self.get_random_valid_cell()
             fm = FlowerMachine(pos)
             if self.is_valid(fm.input) and self.is_valid(fm.output):
                 self.flower_machines.append(fm)
+                return
+
+    def get_random_cell(self):
+        return random.choice(self.cells)
+
+    def get_random_valid_cell(self):
+        while True:
+            pos = self.get_random_cell()
+            if self.is_valid(pos):
+                return pos
+
+    def place_intruder(self):
+        while True:
+            pos = self.get_random_cell()
+            if not self.is_valid(pos):
+                self.intruders.append(Intruder(pos))
                 return
 
 

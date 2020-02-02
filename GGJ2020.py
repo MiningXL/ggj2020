@@ -95,7 +95,7 @@ class GameManager:
             if item == "flower":
                 self.add_flower()
             if item == "intruder":
-                self.hive.intruders.append(Intruder((0,0)))
+                self.hive.place_intruder()
 
     def handle_input(self):
         while(not self.queue.empty()):
@@ -187,9 +187,14 @@ class GameManager:
                 pos = self.bees[id].new_pos(html_dict[i])
                 if self.hive.exists(pos):
                     if not self.hive.cell_state[pos]:
-                        self.hive.cell_state[pos] = 1
-                        self.bees[id].item = None
-                        return
+                        for intr in self.hive.intruders:
+                            if intr.grid_pos == pos:
+                                break
+                        else: # executed only if intr loop did not break -> no intruder on pos
+                            self.hive.cell_state[pos] = 1
+                            self.bees[id].item = None
+                            return
+                        continue # executed if intr loop did break -> pos occupied by intruder
 
     def draw_items(self, surface=None):
         if surface is None:
