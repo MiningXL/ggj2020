@@ -21,7 +21,7 @@ import hive
 from constants import *
 
 import bot
-from asset import Flower, Intruder, Wax
+from asset import Flower, Intruder, Wax, Weapon
 from constants import FPS
 
 import colorsys
@@ -161,6 +161,7 @@ class GameManager:
                     self.dance(id)
                     self.repair_comb(id)
                     self.drop_wax(id)
+                    self.attack(id)
                     self.pick_up(id)
                 else:
                     dir = html_dict[cmd]
@@ -227,6 +228,8 @@ class GameManager:
             self.hive.flowers.append(Flower(self.bees[id].grid_pos))
         elif isinstance(item, Wax):
             self.hive.flowers.append(Wax(self.bees[id].grid_pos))
+        elif isinstance(item, Weapon):
+            self.hive.flowers.append(Weapon(self.bees[id].grid_pos))
         self.bees[id].item = None
 
     def repair_comb(self, id):
@@ -243,6 +246,16 @@ class GameManager:
                             self.bees[id].item = None
                             return
                         continue # executed if intr loop did break -> pos occupied by intruder
+
+    def attack(self,id):
+       if isinstance(self.bees[id].item, Weapon):
+             for i in html_dict:
+                pos = self.bees[id].new_pos(html_dict[i])
+                for intr in self.hive.intruders:
+                    if intr.grid_pos == pos:
+                        self.hive.intruders.remove(intr)
+                        return
+
 
     def draw_items(self, surface=None):
         if surface is None:
