@@ -44,7 +44,6 @@ class Hive:
         """
         Draws a hex grid, based on the map object, onto this Surface
         """
-        surface.fill(pygame.Color('black'))
 
         # put platform to the left
         (top, left) = get_surface_pos(self.flower_spawn_pos[0])
