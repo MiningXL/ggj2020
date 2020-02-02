@@ -29,9 +29,6 @@ pygame.init()
 
 current_path = os.path.dirname(__file__)
 
-sound_path = os.path.join(current_path, 'wild_bees.ogg')
-print(sound_path)
-pygame.mixer.music.load(sound_path)
 
 # initialize the pygame module
 # load and set the logo
@@ -287,6 +284,15 @@ class GameManager:
 def main():
     game = GameManager()
 
+    sound_path = os.path.join(current_path, 'wild_bees.ogg')
+
+    pygame.mixer.pre_init()
+    pygame.mixer.init()
+    # pygame.mixer.music.load(sound_path)
+
+    background_sound = pygame.mixer.Sound(sound_path)
+    pygame.mixer.Channel(1).play(background_sound)
+
     # Key Dictionary
     key_dict = {
         # pygame.key : (xmove, ymove, bee_id)
@@ -309,7 +315,6 @@ def main():
 
     # define Radius from gridsize and screensize
     clock = pygame.time.Clock()
-    pygame.mixer.music.play(100)
     # main loop
     while not game_over:
         clock.tick(FPS)
