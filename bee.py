@@ -15,7 +15,7 @@ class Bee:
         self.color = color
         self.item = None
 
-        self.image = pygame.image.load(os.path.join(current_path, 'BEE_BODY.png'))
+        self.image = pygame.image.load(os.path.join(current_path, 'BEE_BODY_white.png'))
         self.image = pygame.transform.scale(self.image, (2*RADIUS, 2*RADIUS))
         color_bee = pygame.Surface(self.image.get_size()).convert_alpha()
         color_bee.fill(self.color)
