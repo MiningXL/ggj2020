@@ -265,25 +265,21 @@ class GameManager:
         width = 30
         height = min(210,max(0,int(self.temperature)))
 
-        # temperature warning
-        if self.temperature > self.temperature_limits[1]*0.7:
-            speedup = (self.temperature-self.temperature_limits[1]*0.7) // 5
-            freq = (time.time() - self.t0 )
-            warning_level = max(0,int( 255 * (np.sin(freq * speedup))))
-            self.screen.fill((0, 0, warning_level))
-            self.screen.fill((warning_level, 0, 0))
+        self.screen.fill((0, 0, 0))
+
+        warning_level_red = warning_level_green = warning_level_blue = 0
+        if self.temperature > self.temperature_limits[1] * 0.7:
+            freq = (time.time() - self.t0) * 2
+            warning_level_red = max(0, int(255 * (np.abs(np.sin(freq)))))
         elif self.temperature < self.temperature_limits[1]*0.3:
-            speedup = 1+(self.temperature_limits[1]*0.3-self.temperature)// 5
-            freq = (time.time() - self.t0 )
-            warning_level = max(0,int( 255 * (np.sin(freq * speedup))))
-            self.screen.fill((0, 0, warning_level))
+            freq = (time.time() - self.t0 ) * 2
+            warning_level_blue = max(0,int( 255 * (np.abs(np.sin(freq)))))
         else:
-            self.screen.fill((0, 0, 0))
-        #print(self.temperature)
+            warning_level_green = 255
 
         thermometer_current = self.thermometer.copy()
-        pygame.draw.circle(thermometer_current, (255, 0, 0), (35, 273), 30)
-        pygame.draw.rect(thermometer_current, (255,0,0), ((22,247-height), (width,height)))
+        pygame.draw.circle(thermometer_current, (warning_level_red, warning_level_green, warning_level_blue), (35, 273), 30)
+        pygame.draw.rect(thermometer_current, (warning_level_red,warning_level_green, warning_level_blue), ((22,247-height), (width,height)))
         thermometer_current.blit(self.thermometer, ((0,0), (0, 0)))
 
         surface.blit(thermometer_current, ((int(self.disp_width * 0.90),int(self.disp_height * 0.2)), (0, 0)))
