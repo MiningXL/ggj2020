@@ -19,10 +19,11 @@ class Hive:
         self.flowers_collected = 0
         self.intruders = []
         self.wax = [Wax((2,2))]
-        self.flower_machines = [FlowerMachine((5,4))]
+        self.flower_machines = []
         self.items = [self.flowers, self.intruders, self.wax]
         self.cell_state = perlin.gen_perlin((self.rows, self.cols), 2, 100, 0.5, 1.5)
         self.platform = pygame.image.load(os.path.join(current_path, 'Platform.png'))
+        self.place_flower_machine()
 
         self.flower_spawn_pos = [(self.rows-1, i) for i in range(int(self.cols/4),int(self.cols/4)+9)]
 
@@ -30,6 +31,18 @@ class Hive:
         h = self.platform.get_height()
         scaling = 4 * RADIUS/h
         self.platform = pygame.transform.scale(self.platform, (int(w * scaling), int(h * scaling)))
+
+
+    def place_flower_machine(self):
+        while True:
+            pos = random.randint(0,self.rows), random.randint(0,self.cols)
+            if not self.is_valid(pos):
+                continue
+            fm = FlowerMachine(pos)
+            if self.is_valid(fm.input) and self.is_valid(fm.output):
+                self.flower_machines.append(fm)
+                return
+
 
     def is_valid(self, pos):
         if (pos in self.cells) and (self.cell_state[pos]):
