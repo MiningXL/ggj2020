@@ -29,6 +29,10 @@ pygame.init()
 
 current_path = os.path.dirname(__file__)
 
+sound_path = os.path.join(current_path, 'wild_bees.ogg')
+print(sound_path)
+pygame.mixer.music.load(sound_path)
+
 # initialize the pygame module
 # load and set the logo
 pygame.display.set_caption("First Try")
@@ -73,15 +77,26 @@ class GameManager:
         self.temperature_limits = [0, 210]
 
     def new_color(self):
-        colors = np.array([colorsys.rgb_to_hsv(bee.color) for bee in self.bees])
+        # color = colorsys.hsv_to_rgb(random.random(),1,1)
+        # return tuple([int(255*i) for i in color])
+        color = pygame.Color(0,0,0)
+        color.hsva = (random.randint(0,360),100,100,100)
+        return (color.r,color.g,color.b)
+    # needs futher work
+        colors = np.array([colorsys.rgb_to_hsv(*bee.color) for bee in self.bees.values()])
         colors_hue = np.array([c[0] for c in colors])
         if len(colors) <= 2:
             return tuple([255*i for i in colorsys.hsv_to_rgb(random.random(),1,1)])
         else:
-            color_diff = colors_hue[1::] - colors_hue
+            color_diff = np.roll(colors_hue,1) - colors_hue
+            print(colors_hue)
+            print(color_diff)
             index = np.argmax(np.abs(color_diff))
-            color = colors[index] + np.array([color_diff/2,0,0])
-            return tuple(color)
+            print(index)
+            new_hue = colors_hue[index]+color_diff[index]/2
+            color = (int(255*(new_hue)+255)%255, 255, 255)
+            print(new_hue)
+            return color
 
     def add_bee(self, id):
         valied = False
@@ -294,6 +309,7 @@ def main():
 
     # define Radius from gridsize and screensize
     clock = pygame.time.Clock()
+    pygame.mixer.music.play(100)
     # main loop
     while not game_over:
         clock.tick(FPS)
