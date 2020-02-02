@@ -110,18 +110,18 @@ class GameManager:
                     del self.bees[id]
                 except:
                     print("Kill Error")
-            elif (cmd == 'action') and (id in self.bees):
-                self.dance(id)
-                self.repair_comb(id)
-                self.drop_wax(id)
-                self.pick_up(id)
+            elif not id in self.bees:
+                self.add_bee(id)
             else:
-                dir = html_dict[cmd]
-                if id in self.bees:
-                    self.move_bee(id,dir)
+                if cmd == 'action':
+                    self.dance(id)
+                    self.repair_comb(id)
+                    self.drop_wax(id)
+                    self.pick_up(id)
                 else:
-                    self.add_bee(id)
-
+                    dir = html_dict[cmd]
+                    if id in self.bees:
+                        self.move_bee(id,dir)
     def dance(self, id):
         bee = self.bees[id]
         bee.dance()
@@ -304,7 +304,7 @@ def main():
                     game.add_flower()
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
-                game_over = False
+                game_over = True
                 print("Waiting for Tornado")
                 game.tornado_target.stop()
                 game.tornado_thread.join(1)
@@ -324,7 +324,8 @@ def main():
         game.draw_flower_machine()
         game.draw_items()
 
-        game_over = game.check_game_over()
+        if not game_over:
+            game_over = game.check_game_over()
 
         pygame.display.flip()
         # draw a line

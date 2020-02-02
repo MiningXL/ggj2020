@@ -104,9 +104,7 @@ class Hive:
             points_inner = [(RADIUS/4 + x + left, RADIUS/4 + y + top) for (x, y) in unit_cell_inner]
             # Draw the polygon onto the surface
 
-            if col==3 and row == 4:
-                pygame.draw.polygon(surface, (0, 0, 255), points, 0)
-            elif self.cell_state[cell]:
+            if self.cell_state[cell]:
                 pygame.draw.polygon(surface, (255, 204, 0), points, 0)
                 pygame.draw.polygon(surface, (255, 255, 0), points_inner, 0)
             else:
