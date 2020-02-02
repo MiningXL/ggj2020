@@ -22,7 +22,7 @@ class Asset:
 
 class Flower(Asset):
     def __init__(self, grid_pos, id=None, color=None, imagename=None):
-        colors = ["red", "blue", "orange"]
+        colors = ["red", "blue", "orange", "purple", "turkis"]
         imagelist = ["flower_" + c + ".png" for c in colors]
         if imagename is None:
             imagename = random.choice(imagelist)
@@ -39,6 +39,10 @@ class Intruder(Asset):
 
 class Dancer(Asset):
     def __init__(self, grid_pos, id=None, color=None, imagename="wax.png"):
+        super().__init__(grid_pos, imagename)
+
+class Weapon(Asset):
+    def __init__(self, grid_pos, id=None, color=None, imagename="weapon.png"):
         super().__init__(grid_pos, imagename)
 
 class FlowerMachine:
@@ -62,4 +66,3 @@ class FlowerMachine:
 
     def draw(self, surface):
         surface.blit(self.image, (self.draw_pos,(0,0)))
-

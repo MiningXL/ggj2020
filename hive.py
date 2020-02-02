@@ -18,9 +18,10 @@ class Hive:
         self.flowers = [Flower((1,1)),Flower((3,1))]
         self.flowers_collected = 0
         self.intruders = []
+        self.weapons = []
         self.wax = [Wax((2,2))]
         self.flower_machines = []
-        self.items = [self.flowers, self.intruders, self.wax]
+        self.items = [self.flowers, self.intruders, self.wax, self.weapons]
         self.cell_state = perlin.gen_perlin((self.rows, self.cols), 2, 100, 0.5, 1.5)
         self.platform = pygame.image.load(os.path.join(current_path, 'Platform.png'))
         self.place_flower_machine()
@@ -57,6 +58,9 @@ class Hive:
                 self.intruders.append(Intruder(pos))
                 return
 
+    def place_weapon(self):
+        pos = self.get_random_valid_cell()
+        self.weapons.append(Weapon(pos))
 
     def is_valid(self, pos):
         if (pos in self.cells) and (self.cell_state[pos]):
