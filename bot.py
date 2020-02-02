@@ -20,7 +20,7 @@ class Honey_Filter(BaseFilter):
 
 class Intruder_Filter(BaseFilter):
     def filter(self,message):
-        intruders = ["wasp", "bee", "🐝"]
+        intruders = ["vasp", "bee", "🐝", "🦗", "🕷"]
         for h in intruders:
             if h in message.text.lower():
                 return True
@@ -28,11 +28,18 @@ class Intruder_Filter(BaseFilter):
 
 class Weapon_Filter(BaseFilter):
     def filter(self,message):
-        weapons = ["knife", "🔪", "🗡️", "🔫","⚔️", "🏹" ]
+        weapons = ["knife", "🔪", "🗡", "🔫","⚔", "🏹" ]
         for w in weapons:
             if w in message.text.lower():
                 return True
         return False
+
+class Help_Filter(BaseFilter):
+    def filter(self,message):
+        if "help" in message.text.lower():
+            return True
+        return False
+
 
 
 
@@ -53,13 +60,18 @@ class Bot:
         self.add_honey_handler()
         self.add_intruder_handler()
         self.add_weapon_handler()
+        self.add_group_handler()
+        self.add_help_handler()
         self.add_unknown_handler()
         self.start()
         print("Bot started sucessfully")
 
-
+    def add_group(self, update, context):
+        context.bot.send_message(chat_id=update.effective_chat.id, text="start")
     def unknown(self, update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text="that's not a floweer! Wee need more floweers for honeey")
+    def helpp(self, update, context):
+        context.bot.send_message(chat_id=update.effective_chat.id, text="I'm the beehive, please bee nice and send flowers 🌻🌼🌸🌺🥀🌹🌷💐🌾, wee are hungry.\nDon' bee nasty 🐝🦗🕷.")
     def thank(self, update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text="Thanks for thee floweer! Yum")
         self.queue.put("flower")
@@ -69,10 +81,10 @@ class Bot:
         context.bot.send_message(chat_id=update.effective_chat.id, text="Aawwww an intruder!! Defenders go attack!!!")
         self.queue.put("intruder")
     def weapon(self, update, context):
-        context.bot.send_message(chat_id=update.effective_chat.id, text="Tanks a weapon, now wee can defend against intruders!")
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Thanks a weapon, now wee can defend against intruders!")
         self.queue.put("weapon")
     def start_message(self, update, context):
-        context.bot.send_message(chat_id=update.effective_chat.id, text="I'm the beehive, please bee nice and send flowers, wee are hungry.\nDon' bee nasty.")
+        context.bot.send_message(chat_id=update.effective_chat.id, text="I'm the beehive, please bee nice and send flowers 🌻🌼🌸🌺🥀🌹🌷💐🌾, wee are hungry.\nDon' bee nasty 🐝🦗🕷.")
 
     def add_flower_handler(self):
         flower_filter = Flower_Filter()
@@ -94,6 +106,12 @@ class Bot:
         weapon_handler = MessageHandler(weapon_filter, self.weapon)
         self.dispatcher.add_handler(weapon_handler)
 
+    def add_help_handler(self):
+        help_filter = Help_Filter()
+        help_handler = MessageHandler(help_filter, self.helpp)
+        self.dispatcher.add_handler(help_handler)
+
+
     def add_handler(self, filter_text, message):
         class Filter(BaseFilter):
             def filter(self, message):
@@ -108,6 +126,10 @@ class Bot:
     def add_unknown_handler(self):
         unknown_handler = MessageHandler(Filters.text, self.unknown)
         self.dispatcher.add_handler(unknown_handler)
+
+    def add_group_handler(self):
+        add_group_handle = MessageHandler(Filters.status_update.new_chat_members, self.add_group)
+        self.dispatcher.add_handler(add_group_handle)
 
     def start(self):
         self.updater.start_polling()
