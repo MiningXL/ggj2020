@@ -245,6 +245,12 @@ class GameManager:
 
         surface.blit(thermometer_current, ((int(self.disp_width * 0.90),int(self.disp_height * 0.2)), (0, 0)))
 
+    def check_game_over(self):
+        if sum(state == 0 for state in self.hive.cell_state.values()) == 0:
+            return True
+        else:
+            return False
+
 # define a main function
 def main():
     game = GameManager()
@@ -267,12 +273,12 @@ def main():
     }
 
     # define a variable to control the main loop
-    running = True
+    game_over = False
 
     # define Radius from gridsize and screensize
     clock = pygame.time.Clock()
     # main loop
-    while running:
+    while not game_over:
         clock.tick(FPS)
         # event handling, gets all event from the event queue
         for event in pygame.event.get():
@@ -308,6 +314,8 @@ def main():
         # game.draw_intruders()
         game.draw_items()
         game.draw_temperature()
+
+        game_over = game.check_game_over()
 
         pygame.display.flip()
         # draw a line
