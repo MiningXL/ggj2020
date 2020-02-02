@@ -129,6 +129,8 @@ class GameManager:
                 self.add_flower()
             if item == "intruder":
                 self.hive.place_intruder()
+            if item == "weapon":
+                self.hive.place_weapon()
 
     def handle_input(self):
         while(not self.queue.empty()):

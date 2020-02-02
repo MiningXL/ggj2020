@@ -26,6 +26,15 @@ class Intruder_Filter(BaseFilter):
                 return True
         return False
 
+class Weapon_Filter(BaseFilter):
+    def filter(self,message):
+        weapons = ["knife", "🔪", "🗡️", "🔫","⚔️", "🏹" ]
+        for w in weapons:
+            if w in message.text.lower():
+                return True
+        return False
+
+
 
 class Bot:
     def __init__(self, queue):
@@ -43,6 +52,7 @@ class Bot:
         self.add_flower_handler()
         self.add_honey_handler()
         self.add_intruder_handler()
+        self.add_weapon_handler()
         self.add_unknown_handler()
         self.start()
         print("Bot started sucessfully")
@@ -58,6 +68,9 @@ class Bot:
     def intruder(self, update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text="Aawwww an intruder!! Defenders go attack!!!")
         self.queue.put("intruder")
+    def weapon(self, update, context):
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Tanks a weapon, now wee can defend against intruders!")
+        self.queue.put("weapon")
     def start_message(self, update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text="I'm the beehive, please bee nice and send flowers, wee are hungry.\nDon' bee nasty.")
 
@@ -76,6 +89,11 @@ class Bot:
         intruder_handler = MessageHandler(intruder_filter, self.intruder)
         self.dispatcher.add_handler(intruder_handler)
 
+    def add_weapon_handler(self):
+        weapon_filter = Weapon_Filter()
+        weapon_handler = MessageHandler(weapon_filter, self.weapon)
+        self.dispatcher.add_handler(weapon_handler)
+
     def add_handler(self, filter_text, message):
         class Filter(BaseFilter):
             def filter(self, message):
@@ -83,8 +101,6 @@ class Bot:
                     if t in message.text:
                         return True
                 return False
-        def intruder(update, context):
-            context.bot.send_message(chat_id=update.effective_chat.id, text="Aawwww an intruder!! Defenders go attack!!!")
         _filter = Filter()
         handler = MessageHandler(_filter, reply)
         self.dispatcher.add_handler(handler)
