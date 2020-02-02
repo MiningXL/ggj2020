@@ -73,7 +73,15 @@ class GameManager:
         self.temperature_limits = [0, 210]
 
     def new_color(self):
-        return tuple([255*i for i in colorsys.hsv_to_rgb(random.random(),1,1)])
+        colors = np.array([colorsys.rgb_to_hsv(bee.color) for bee in self.bees])
+        colors_hue = np.array([c[0] for c in colors])
+        if len(colors) <= 2:
+            return tuple([255*i for i in colorsys.hsv_to_rgb(random.random(),1,1)])
+        else:
+            color_diff = colors_hue[1::] - colors_hue
+            index = np.argmax(np.abs(color_diff))
+            color = colors[index] + np.array([color_diff/2,0,0])
+            return tuple(color)
 
     def add_bee(self, id):
         valied = False
