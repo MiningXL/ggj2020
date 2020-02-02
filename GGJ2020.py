@@ -68,7 +68,7 @@ class GameManager:
         if telegram:
             self.bot = bot.Bot(self.bot_queue)
 
-        self.temperature = 60
+        self.temperature = 150
         self.temperature_game_over = temperature_game_over
         self.temperature_limits = [0, 210]
 
