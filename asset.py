@@ -13,7 +13,7 @@ class Asset:
         self.grid_pos = grid_pos
 
         self.image = pygame.image.load(os.path.join(current_path, imagename))
-        self.image = pygame.transform.scale(self.image, (2*RADIUS, 2*RADIUS))
+        self.image = pygame.transform.scale(self.image, (int(1.5*RADIUS), int(1.5*RADIUS)))
         self.surface_pos = get_surface_pos(grid_pos)
 
     def paint(self, surface):

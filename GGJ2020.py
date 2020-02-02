@@ -97,6 +97,7 @@ class GameManager:
         self.bot_queue = queue.Queue()
         if telegram:
             self.bot = bot.Bot(self.bot_queue)
+
         self.flower_machine = FlowerMachine((5,4))
 
         self.temperature = 200
@@ -114,19 +115,19 @@ class GameManager:
         color = self.new_color()
         self.bees.update({id: Bee((x,y), id=id, color=color)})
 
-        self.bot_queue = queue.Queue()
-        self.bot = bot.Bot(self.bot_queue)
+    def add_flower(self):
+        pos_found = False
+        while not pos_found:
+            pos = self.hive.flower_spawn_pos[random.randint(0,len(self.hive.flower_spawn_pos)-1)]
+            if self.hive.is_valid(pos):
+                pos_found = True
+                self.hive.flowers.append(Flower(pos))
 
     def handle_bot_queue(self):
         while(not self.bot_queue.empty()):
             item = self.bot_queue.get()
             if item == "flower":
-                pos_found = False
-                while not pos_found:
-                    pos = (random.randint(0,self.hive.rows), random.randint(0,self.hive.cols))
-                    if self.hive.is_valid(pos):
-                        pos_found = True
-                        self.hive.flowers.append(Flower(pos))
+                self.add_flower()
             if item == "intruder":
                 self.hive.intruders.append(Intruder((0,0)))
 
@@ -284,6 +285,8 @@ def main():
                     pass
                 if event.key == pygame.K_PLUS:
                     game.add_bee(random.randint(0,100))
+                if event.key == pygame.K_SPACE:
+                    game.add_flower()
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
                 running = False
@@ -298,11 +301,11 @@ def main():
 
         game.animate_bees()
         game.hive.draw_grid(game.screen)
+        game.draw_flower_machine()
         game.draw_bees()
 
         # game.draw_flowers()
         # game.draw_intruders()
-        game.draw_flower_machine()
         game.draw_items()
         game.draw_temperature()
 

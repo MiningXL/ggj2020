@@ -3,12 +3,15 @@ from constants import *
 import itertools as it
 from asset import Flower, Intruder, Wax
 import perlin
+import os
+
+from helper import get_surface_pos
+
+current_path = os.path.dirname(__file__)
 
 # define secondary functions
 class Hive:
     def __init__(self, rows, cols):
-        print("rows = ", rows)
-        print("cols = ", cols)
         self.rows = rows
         self.cols = cols
         self.cells = list(it.product(range(self.rows),range(self.cols)))
@@ -18,6 +21,14 @@ class Hive:
         self.wax = []
         self.items = [self.flowers, self.intruders, self.wax]
         self.cell_state = perlin.gen_perlin((self.rows, self.cols), 2, 100, 0.5, 1.5)
+        self.platform = pygame.image.load(os.path.join(current_path, 'Platform.png'))
+
+        self.flower_spawn_pos = [(self.rows-1, i) for i in range(int(self.cols/4),int(self.cols/4)+9)]
+
+        w = self.platform.get_width()
+        h = self.platform.get_height()
+        scaling = 4 * RADIUS/h
+        self.platform = pygame.transform.scale(self.platform, (int(w * scaling), int(h * scaling)))
 
     def is_valid(self, pos):
         if (pos in self.cells) and (self.cell_state[pos]):
@@ -33,6 +44,11 @@ class Hive:
         Draws a hex grid, based on the map object, onto this Surface
         """
         surface.fill(pygame.Color('black'))
+
+        # put platform to the left
+        (top, left) = get_surface_pos(self.flower_spawn_pos[0])
+        surface.blit(self.platform, ((top-RADIUS, left-RADIUS), (0, 0)))
+
         unit_cell = [(.5 * RADIUS, 0),
                     (1.5 * RADIUS, 0),
                     (2 * RADIUS, SQRT3 / 2 * RADIUS),
