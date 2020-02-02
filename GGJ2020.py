@@ -43,7 +43,8 @@ class GameManager:
 
         self.t0 = time.time()
 
-        self.screen = pygame.display.set_mode((self.disp_width, self.disp_height))
+        # self.screen = pygame.display.set_mode((self.disp_width, self.disp_height))
+        self.screen = pygame.display.set_mode(flags=pygame.FULLSCREEN)
 
         self.grid_height = GRID_HEIGHT
         self.grid_width = GRID_WIDTH
