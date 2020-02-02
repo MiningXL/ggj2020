@@ -341,7 +341,7 @@ def main():
 
     reason = None
 
-    game = GameManager()
+    game = GameManager(telegram=True)
     pygame.mixer.pre_init()
     pygame.mixer.init()
     # pygame.mixer.music.load(sound_path)

@@ -5,8 +5,8 @@ from enum import Enum
 DISP_HEIGHT = 1024
 DISP_WIDTH = 1280
 
-GRID_HEIGHT = 40
-GRID_WIDTH = 50
+GRID_HEIGHT = 25
+GRID_WIDTH = 20
 
 # width: 1.65
 # height: 1.8
