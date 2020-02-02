@@ -6,6 +6,7 @@ import os
 import pygame
 import numpy as np
 import threading
+import subprocess
 
 from map import Map
 
@@ -295,7 +296,7 @@ class GameManager:
         num_bees = len(self.bees)
         num_dancer = sum([bee.isdancer() for bee in self.bees.values()])
         pygame.mixer.Channel(1).set_volume(self.audio_function(num_bees))
-        pygame.mixer.Channel(2).set_volume(self.audio_function(num_dancer))
+        pygame.mixer.Channel(2).set_volume(self.audio_function(num_dancer) if num_dancer > 0 else 0)
         # print(self.background_sound.get_volume())
         # print(pygame.mixer.Channel(1).get_volume())
 
@@ -305,8 +306,9 @@ class GameManager:
 
 # define a main function
 def main():
-    game = GameManager()
+    subprocess.run(["mpv", "--fs", "BEE_Intro.mpg"])
 
+    game = GameManager()
     pygame.mixer.pre_init()
     pygame.mixer.init()
     # pygame.mixer.music.load(sound_path)
