@@ -70,7 +70,7 @@ class GameManager:
         if telegram:
             self.bot = bot.Bot(self.bot_queue)
 
-        self.temperature = 150
+        self.temperature = 15
         self.temperature_game_over = temperature_game_over
         self.temperature_limits = [0, 210]
 
@@ -270,20 +270,24 @@ class GameManager:
 
     def check_game_over(self):
         if sum(state == 0 for state in self.hive.cell_state.values()) == 0:
-            return True
+            return (True, 'WIN')
         elif self.temperature_game_over:
             if self.temperature <= self.temperature_limits[0]:
                 print("Bees froze to death!")
-                return True, 'HEAT'
+                return (True, 'HEAT')
             elif self.temperature >= self.temperature_limits[1]:
                 print("Bees suffocated to the heat!")
-                return True, 'COLD'
-        else:
-            return False, 'WIN'
+                return (True, 'COLD')
+        return (False, None)
 
-    def draw_game_over(self):
-        pass
-        #self.screen.blit()
+    def draw_game_over(self, reason):
+        if reason == 'WIN':
+            pass
+        elif reason == 'HEAT':
+            pass
+        elif reason == 'COLD':
+            pass
+            self.screen.blit(self.game_over_1, ((0,0), (0,0)))
 
 # define a main function
 def main():
@@ -360,9 +364,10 @@ def main():
         game.draw_items()
 
         if not game_over:
-            game_over, reason = game.check_game_over()
+            (game_over, reason) = game.check_game_over()
 
-            game.draw_game_over(reason)
+            if game_over:
+                game.draw_game_over(reason)
 
         pygame.display.flip()
         # draw a line
