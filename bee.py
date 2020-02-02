@@ -29,17 +29,21 @@ class Bee:
         line_bee = pygame.transform.scale(line_bee, (2*RADIUS, 2*RADIUS))
         self.image.blit(line_bee, (0, 0))
 
-        dancing_bee = pygame.image.load(os.path.join(current_path, 'BEE_Dancing.png'))
-        dancing_bee = pygame.transform.scale(dancing_bee, (2 * RADIUS, 2 * RADIUS))
+        dancing_bee_glasses = pygame.image.load(os.path.join(current_path, 'BEE_Dancing_Sunglases.png'))
+        dancing_bee_stars = pygame.image.load(os.path.join(current_path, 'BEE_Dancing_Stars.png'))
+        dancing_bee_glasses = pygame.transform.scale(dancing_bee_glasses, (2 * RADIUS, 2 * RADIUS))
+        dancing_bee_stars = pygame.transform.scale(dancing_bee_stars, (2 * RADIUS, 2 * RADIUS))
 
         self.dancing_sprites = [self.image]
         self.dancing_state = 0
         n_steps = 50
         for i in range(1,n_steps):
             dancing_body = pygame.transform.rotate(self.image, 360 / n_steps * i)
-            dancing_ovelay = pygame.transform.rotate(dancing_bee, 360 / n_steps * i)
+            dancing_ovelay_glasses = pygame.transform.rotate(dancing_bee_glasses, 360 / n_steps * i)
+            dancing_ovelay_stars = pygame.transform.rotate(dancing_bee_stars, 360 / n_steps * i)
             if i//10 % 2:
-                dancing_body.blit(dancing_ovelay, (0,0))
+                dancing_body.blit(dancing_ovelay_stars, (0,0))
+            dancing_body.blit(dancing_ovelay_glasses, (0,0))
             self.dancing_sprites.append(dancing_body)
 
         basket = pygame.image.load(os.path.join(current_path, 'BEE_Basket_Flowers.png'))
@@ -47,6 +51,9 @@ class Bee:
 
         wax = pygame.image.load(os.path.join(current_path, 'BEE_Wax.png'))
         self.wax = pygame.transform.scale(wax, (2 * RADIUS, 2 * RADIUS))
+
+        helmet = pygame.image.load(os.path.join(current_path, 'BEE_helmet_orange.png'))
+        self.helmet = pygame.transform.scale(helmet, (2 * RADIUS, 2 * RADIUS))
 
         self.surface_pos = self.get_target_pos() # current draw position of bee
 
@@ -66,7 +73,8 @@ class Bee:
         if isinstance(self.item, Flower):
             surface.blit(self.basket, (bee_pos_shift, (0,0)))
         if isinstance(self.item, Wax):
-            surface.blit(self.wax, (bee_pos_shift, (0,0)))
+            surface.blit(self.wax, (bee_pos_shift, (0, 0)))
+            surface.blit(self.helmet, (bee_pos_shift, (0,0)))
 
         # radius = surface.get_width() / 2
         # # draw Biene
@@ -88,10 +96,8 @@ class Bee:
 
     def dance(self):
         if self.item is None:
-            print("I am the dancing bee")
             self.item = Dancer(self.grid_pos)
         elif self.isdancer():
-            print("stop dancing")
             self.item = None
 
     def isdancer(self):
