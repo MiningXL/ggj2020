@@ -56,6 +56,7 @@ class GameManager:
         }
 
         self.thermometer = pygame.image.load(os.path.join(current_path, 'Thermometer_grey.png'))
+        self.game_over_1 = pygame.image.load(os.path.join(current_path, 'BEE_Honey.png'))
 
         self.queue = queue.Queue(maxsize=10)
 
@@ -276,12 +277,16 @@ class GameManager:
         elif self.temperature_game_over:
             if self.temperature <= self.temperature_limits[0]:
                 print("Bees froze to death!")
-                return True
+                return True, 'HEAT'
             elif self.temperature >= self.temperature_limits[1]:
                 print("Bees suffocated to the heat!")
-                return True
+                return True, 'COLD'
         else:
-            return False
+            return False, 'WIN'
+
+    def draw_game_over(self):
+        pass
+        #self.screen.blit()
 
 # define a main function
 def main():
@@ -309,7 +314,7 @@ def main():
 
     # define Radius from gridsize and screensize
     clock = pygame.time.Clock()
-    pygame.mixer.music.play(100)
+#    pygame.mixer.music.play(100)
     # main loop
     while not game_over:
         clock.tick(FPS)
@@ -349,10 +354,14 @@ def main():
         game.draw_items()
 
         if not game_over:
-            game_over = game.check_game_over()
+            game_over, reason = game.check_game_over()
+
+            game.draw_game_over(reason)
 
         pygame.display.flip()
         # draw a line
+
+    time.sleep(3)
 
     pygame.display.quit()
     if hasattr(game, 'bot'):
